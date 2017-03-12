@@ -8,8 +8,7 @@
 
 import gi
 import os
-from gi.repository import Gtk
-from gi.repository import GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GObject
 from holoview.capture import Capture
 
 gi.require_version('Gtk', '3.0')
@@ -37,16 +36,19 @@ class MainWindow:
 
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
-        self.ui["menu_quit"].connect("activate", Gtk.main_quit)
+        self.ui["menu_quit"].connect("activate", self.end)
         self.ui["main_window"].show_all()
         self.capture.connect("frame_captured", self.show_image, "preview")
 
-        self.capture.record()
+        GObject.threads_init()
+        self.capture.start()
 
-    def show_image(self, img, type):
+    def show_image(self, sender, img, type):
         """Show a certain type of image in the main window."""
         if type is "preview":
-            image = GdkPixbuf.Pixbuf.new_from_bytes(img)
+            image = GdkPixbuf.Pixbuf.new_from_bytes(img,
+                                                    GdkPixbuf.Colorspace.RGB,
+                                                    False, 8, 1280, 720, 1280*3)
             print("Loaded new image")
             self.ui["capture_image"].set_from_pixbuf(image)
 

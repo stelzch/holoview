@@ -219,12 +219,6 @@ THE SOFTWARE.
                         <property name="top_attach">2</property>
                       </packing>
                     </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
                   </object>
                   <packing>
                     <property name="resize">False</property>
@@ -232,18 +226,29 @@ THE SOFTWARE.
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkImage" id="capture_image">
-                    <property name="width_request">500</property>
-                    <property name="height_request">400</property>
+                  <object class="GtkScrolledWindow">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="hexpand">True</property>
-                    <property name="vexpand">True</property>
-                    <property name="stock">gtk-missing-image</property>
+                    <property name="can_focus">True</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkImage" id="capture_image">
+                            <property name="width_request">500</property>
+                            <property name="height_request">400</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="stock">gtk-missing-image</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="resize">True</property>
-                    <property name="shrink">False</property>
+                    <property name="shrink">True</property>
                   </packing>
                 </child>
               </object>
@@ -279,7 +284,7 @@ THE SOFTWARE.
         </child>
       </object>
     </child>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
   </object>

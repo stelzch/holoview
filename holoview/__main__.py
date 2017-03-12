@@ -14,4 +14,5 @@ gi.require_version('Gtk', '3.0')
 
 if __name__ == '__main__':
     mainwindow = MainWindow()
+    print("Running")
     Gtk.main()

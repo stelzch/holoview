@@ -8,11 +8,13 @@
 import gi
 from gi.repository import Gtk
 from holoview.mainwindow import MainWindow
+from holoview import log
 
 gi.require_version('Gtk', '3.0')
 
 
 if __name__ == '__main__':
+    logger = log.create_custom_logger('HoloView')
+    logger.debug('Starting application')
     mainwindow = MainWindow()
-    print("Running")
     Gtk.main()

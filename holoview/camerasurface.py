@@ -32,8 +32,9 @@ class CameraSurface(Gtk.DrawingArea):
         if not Gst.is_initialized():
             logger.error("GStreamer Library not initialized")
 
-        if not os.exists(self.uri):
-            logger.error("Capture Device {} does not exist.".format(self.uri))
+        if not os.path.exists(self.uri.split("://")[1]):
+            logger.error("Capture Device {} does not" +
+                         "exist (or access is denied).".format(self.uri))
 
         # Setup GStreamer Playbin and event handling
         self.player = Gst.ElementFactory.make("playbin", "player")
@@ -56,10 +57,10 @@ class CameraSurface(Gtk.DrawingArea):
     def on_gst_sync_message(self, bus, message):
         """Handle a Gstreamer Sync Message."""
         if message.get_structure().get_name() == 'prepare-window-handle':
-            """Tell Gstreamer the X11 ID so it can write the images to it."""
             imagesink = message.src
             """Force aspect ratio, so images are not distorted."""
             imagesink.set_property("force-aspect-ratio", True)
+            """Tell Gstreamer the X11 ID so it can write the images to it."""
             imagesink.set_window_handle(self.get_property('window').get_xid())
 
     def set_uri(self, uri):

@@ -29,6 +29,6 @@ setup(name='holoview',
       packages=find_packages(),
       install_requires=[],
       package_data={
-          'holoview': ['ui/*.glade']
+          'holoview': ['ui/*.glade', 'ui/*.png']
       },
       include_package_data=True)

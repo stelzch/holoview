@@ -17,6 +17,7 @@ setup(name='holoview',
       author='Christoph Stelz',
       author_email='mail@ch-st.de',
       url='https://github.com/stelzch/holmos',
+      license='MIT',
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Education',
@@ -29,6 +30,11 @@ setup(name='holoview',
       packages=find_packages(),
       install_requires=[],
       package_data={
-          'holoview': ['ui/*.glade', 'ui/*.png']
+          'holoview': ['data/mainwindow.glade', 'data/overlay.png']
       },
-      include_package_data=True)
+      include_package_data=True,
+      entry_points={
+          'console_scripts': [
+              'holoview=holoview:main'
+          ]
+      })

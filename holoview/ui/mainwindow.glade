@@ -448,9 +448,9 @@ Niklas Jacobs</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="proc_box">
+                  <object class="GtkPaned" id="proc_box">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can_focus">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
                     <child>

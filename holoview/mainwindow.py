@@ -13,6 +13,7 @@ from gi.repository import Gtk, GtkSource, GObject, GLib
 from PIL import Image
 from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
+from holoview.scripting import ScriptResultViewer
 
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -49,6 +50,7 @@ class MainWindow:
         self.ui["proc_box"] = builder.get_object("proc_box")
         self.ui["load_script"] = builder.get_object("load_script")
         self.ui["save_script"] = builder.get_object("save_script")
+        self.ui["script_result"] = ScriptResultViewer()
 
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
@@ -86,7 +88,8 @@ class MainWindow:
         self.ui["script_editor"].set_show_line_numbers(True)
         self.ui["script_editor"].set_show_right_margin(True)
         self.ui["script_editor"].set_tab_width(4)
-        self.ui["proc_box"].pack_start(self.ui["script_editor"], True, True, 0)
+        self.ui["proc_box"].add1(self.ui["script_editor"])
+        self.ui["proc_box"].add2(self.ui["script_result"])
 
         # Setup dialogs
         self.ui["script_chooser"] = Gtk.FileChooserDialog(

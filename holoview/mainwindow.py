@@ -8,12 +8,15 @@
 import gi
 import os
 import cv2
+import logging
 from gi.repository import Gtk
 from PIL import Image
 from picamera import PiCamera
+from holoview.imageutils import rgbarray2pixbuf
 
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
+logger = logging.getLogger('HoloView')
 
 
 class MainWindow:
@@ -36,6 +39,7 @@ class MainWindow:
         self.ui["capture_image"] = builder.get_object("capture_image")
         self.ui["capture_button"] = builder.get_object("capture_button")
         self.ui["tab_widget"] = builder.get_object("tab_widget")
+        self.ui["resolution_combo"] = builder.get_object("resolution_combo")
 
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
@@ -48,25 +52,16 @@ class MainWindow:
                                           self.capture_param_changed)
         self.ui["saturation_adjus"].connect("value-changed",
                                             self.capture_param_changed)
+        self.ui["resolution_combo"].connect("changed",
+                                            self.on_resolution_change)
 
         # Other flags
         self.previewing = False
 
         # Initialize camera with overlay
         self.camera = PiCamera()
-        # self.overlay_image = cv2.imread("%s/ui/overlay.png" % curdir)
-        # self.overlay_image = cv2.cvtColor(self.overlay_image,
-        #                                  cv2.COLOR_BGRA2RGBA)
         self.overlay_image = Image.open('%s/ui/overlay.png' % curdir)
         self.overlay_image = self.overlay_image.tostring()
-        """
-        overlayBytes = io.BytesIO()
-        with open("%s/ui/overlay.ppm" % curdir, "rb") as pixmap:
-            pixloader = PixbufLoader.new_with_type("image/x-portable-pixmap")
-            pixloader.write(pixmap.read())
-            overlay = pixloader.get_pixbuf()
-            overlayBytes.write(overlay.get_pixels())
-        self.camera.add_overlay(overlayBytes, format='rgba') """
 
         self.ui["main_window"].show_all()
 
@@ -79,17 +74,23 @@ class MainWindow:
                                                    size=(1920, 1080),
                                                    format='rgba',
                                                    layer=4)
-            print("Preview started")
+            logger.info("Viewfinder started")
             self.previewing = True
 
     def capture_param_changed(self, widget):
         """Change capture parameter for the camera."""
         if widget is self.ui["brightness_adjus"]:
-            self.camera.brightness = int(widget.get_value())
+            value = int(widget.get_value())
+            self.camera.brightness = value
+            logger.info("Setting brightness to {}".format(value))
         elif widget is self.ui["contrast_adjus"]:
-            self.camera.contrast = int(widget.get_value() * 2 - 100)
+            value = int(widget.get_value() * 2 - 100)
+            self.camera.contrast = value
+            logger.info("Setting contrast to {}".format(value))
         elif widget is self.ui["saturation_adjus"]:
-            self.camera.saturation = int(widget.get_value() * 2 - 100)
+            value = int(widget.get_value() * 2 - 100)
+            self.camera.saturation = value
+            logger.info("Setting saturation to {}".format(value))
 
     def on_key(self, widget, event):
         """Handle incoming key events."""
@@ -98,13 +99,26 @@ class MainWindow:
             self.camera.stop_preview()
             # TODO: Capture to buffer, not to file
             self.camera.capture("/tmp/image.jpg")
-            self.ui["capture_image"].set_from_file("/tmp/image.jpg")
+            self.captured_image = cv2.imread("/tmp/image.jpg")
+            self.captured_image = cv2.cvtColor(self.captured_image,
+                                               cv2.COLOR_BGR2RGB)
+            pixbuf = rgbarray2pixbuf(self.captured_image)
+            self.ui["capture_image"].set_from_pixbuf(pixbuf)
             self.camera.remove_overlay(self.overlay)
             self.previewing = False
+            logger.info("Image was captured")
         elif self.previewing and event.keyval is ord('q'):
             self.camera.stop_preview()
             self.camera.remove_overlay(self.overlay)
             self.previewing = False
+            logger.info("Viewfinder quit")
+
+    def on_resolution_change(self, widget):
+        """Handle change of resolution in capture settings."""
+        res = self.ui["resolution_combo"].get_active_text()
+        width, height = res.split("x")
+        logger.info("Setting resolution to {}x{}".format(width, height))
+        self.camera.resolution = (int(width), int(height))
 
     def end(self, widget, *data):
         """Stop any running capture and end program."""

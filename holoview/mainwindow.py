@@ -45,12 +45,10 @@ class MainWindow:
         self.ui["capture_button"] = builder.get_object("capture_button")
         self.ui["tab_widget"] = builder.get_object("tab_widget")
         self.ui["resolution_combo"] = builder.get_object("resolution_combo")
+        self.ui["about_dialog"] = builder.get_object("about_dialog")
+        self.ui["proc_box"] = builder.get_object("proc_box")
         self.ui["load_script"] = builder.get_object("load_script")
         self.ui["save_script"] = builder.get_object("save_script")
-        self.ui["script_chooser"] = builder.get_object("script_chooser")
-        self.ui["script_saver"] = builder.get_object("script_saver")
-        self.ui["script_editor"] = builder.get_object("script_editor")
-        self.ui["about_dialog"] = builder.get_object("about_dialog")
 
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
@@ -73,7 +71,22 @@ class MainWindow:
 
         """ This is a textbuffer containing the source typed in the
         sourceview editor."""
-        self.source = builder.get_object("source")
+        language_manager = GtkSource.LanguageManager.new()
+        style_manager = GtkSource.StyleSchemeManager.new()
+        print(style_manager.get_scheme_ids())
+        python_lang = language_manager.get_language("python3")
+        self.source = GtkSource.Buffer.new_with_language(python_lang)
+        self.source.set_style_scheme(
+            style_manager.get_scheme("solarized-dark")
+        )
+        self.ui["script_editor"] = GtkSource.View.new_with_buffer(self.source)
+        self.ui["script_editor"].set_indent_on_tab(True)
+        self.ui["script_editor"].set_indent_width(4)
+        self.ui["script_editor"].set_insert_spaces_instead_of_tabs(True)
+        self.ui["script_editor"].set_show_line_numbers(True)
+        self.ui["script_editor"].set_show_right_margin(True)
+        self.ui["script_editor"].set_tab_width(4)
+        self.ui["proc_box"].pack_start(self.ui["script_editor"], True, True, 0)
 
         # Setup dialogs
         self.ui["script_chooser"] = Gtk.FileChooserDialog(
@@ -93,7 +106,6 @@ class MainWindow:
 
         # Other flags
         self.previewing = False
-        self.source.set_text("Hello World")
 
         # Initialize camera with overlay
         self.camera = PiCamera()
@@ -180,7 +192,7 @@ class MainWindow:
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                  Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
             )
-
+            self.ui["script_saver"].add_filter(self.ui["python_filter"])
         elif widget is self.ui["load_script"]:
             """ Here a filechooser is opened to let the user choose a file.
             Its content is then loaded into the GtkSourceView."""
@@ -199,6 +211,7 @@ class MainWindow:
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                  Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
             )
+            self.ui["script_chooser"].add_filter(self.ui["python_filter"])
 
     def on_menu(self, widget, *event):
         """Handle menu items."""

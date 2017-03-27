@@ -6,6 +6,9 @@
 |__|__|___|_|_|_|_|_____|_____|
 """
 import gi
+import cv2
+import logging
+import numpy as np
 from gi.repository import Gtk, Gst, GObject
 from holoview.mainwindow import MainWindow
 from holoview import log

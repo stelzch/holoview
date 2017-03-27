@@ -33,19 +33,22 @@ Besides the modules, the script can use the following variables:
   - output_vars     - dict of variables (str/float) to display in HoloView
   - output_figs     - dict of matplotlib figures to display in HoloView
 """
-import logging
 import gi
 from gi.repository import Gtk
+import matplotlib
+import logging
 
+matplotlib.use("Gtk3Agg")
 gi.require_version('Gtk', '3.0')
 logger = logging.getLogger('HoloView')
 default_modules = [
-    "import cv2",
     "import numpy as np",
     "import PIL",
     "import matplotlib.pyplot as plt"
 ]
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
 class Script:
     """Representing a user-written script for image evaluation."""
@@ -53,7 +56,9 @@ class Script:
     def __init__(self, source="", import_lines=default_modules):
         """Create a new Script object."""
         self.source = source
-        self.output_vars = dict()
+        self.output_vars = {
+        "test":"var"
+        }
         self.output_figs = dict()
         self.import_lines = import_lines
 
@@ -96,7 +101,7 @@ class Script:
 
         # Here we go
         exec(script, script_globals)
-        logger.debug("Script left behind the following results:\n{}".format(
+        logger.debug("Script left behind the following results:\n{}\n{}".format(
             self.output_vars,
             self.output_figs
         ))
@@ -125,7 +130,7 @@ class ScriptResultViewer:
         self.ui["variable_view"].append_column(var_name)
         self.ui["variable_view"].append_column(var_value)
 
-        self.box.pack_start(self.ui["variable_view"], True, True, 0)
+        # self.box.pack_start(self.ui["variable_view"], True, True, 0)
         self.box.pack_start(self.ui["notebook"], True, True, 0)
 
     def get_widget(self):
@@ -136,9 +141,23 @@ class ScriptResultViewer:
         """View the results of a given script."""
         # Clear previous results
         self.variable_model.clear()
+        while self.ui["notebook"].get_n_pages() is not 0:
+            self.ui["notebook"].remove_page(0)
 
         variables, figs = script.get_results()
+        print(figs)
 
         for key in variables:
             print(key, ":", variables[key])
             self.variable_model.append([str(key), str(variables[key])])
+        for key in figs:
+            if type(figs[key]) is matplotlib.figure.Figure:
+                print(figs)
+                logger.info("Processing figure {}".format(key))
+                sw = Gtk.ScrolledWindow()
+                canvas = FigureCanvas(figs[key])
+                sw.add_with_viewport(canvas)
+
+                self.tabs[key] = sw
+                self.ui["notebook"].append_page(sw, Gtk.Label.new(key))
+                self.ui["notebook"].show_all()

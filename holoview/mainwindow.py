@@ -7,8 +7,8 @@
 """
 import gi
 import os
-import cv2
 import logging
+import cv2
 import numpy as np
 from gi.repository import Gtk, GtkSource, GObject, GLib
 from PIL import Image
@@ -16,10 +16,11 @@ from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
 from holoview.scripting import ScriptResultViewer, Script
 
+
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
 docdir = GLib.get_user_special_dir(GLib.USER_DIRECTORY_DOCUMENTS)
-logger = logging.getLogger('HoloView')
+logger = logging.getLogger("HoloView")
 
 
 class MainWindow:

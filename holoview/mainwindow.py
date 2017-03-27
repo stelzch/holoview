@@ -9,11 +9,12 @@ import gi
 import os
 import cv2
 import logging
+import numpy as np
 from gi.repository import Gtk, GtkSource, GObject, GLib
 from PIL import Image
 from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
-from holoview.scripting import ScriptResultViewer
+from holoview.scripting import ScriptResultViewer, Script
 
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
@@ -50,6 +51,7 @@ class MainWindow:
         self.ui["proc_box"] = builder.get_object("proc_box")
         self.ui["load_script"] = builder.get_object("load_script")
         self.ui["save_script"] = builder.get_object("save_script")
+        self.ui["run_script"] = builder.get_object("run_script")
         self.ui["script_result"] = ScriptResultViewer()
 
         # Connect signals
@@ -68,14 +70,26 @@ class MainWindow:
                                             self.on_resolution_change)
         self.ui["load_script"].connect("clicked", self.on_toolbar)
         self.ui["save_script"].connect("clicked", self.on_toolbar)
+        self.ui["run_script"].connect("clicked", self.on_toolbar)
         self.ui["python_filter"] = builder.get_object("python_filter")
         self.ui["python_filter"].set_name("Python files")
+        self.ui["script_container"] = builder.get_object(
+            "script_editor_container")
 
         """ This is a textbuffer containing the source typed in the
         sourceview editor."""
         language_manager = GtkSource.LanguageManager.new()
         style_manager = GtkSource.StyleSchemeManager.new()
-        print(style_manager.get_scheme_ids())
+        logger.info(
+            "The following GtkSourceView themes are installed: {}".format(
+                style_manager.get_scheme_ids()
+            )
+        )
+        logger.info(
+            "The following GtkSourceView langs are installed: {}".format(
+                language_manager.get_language_ids()
+            )
+        )
         python_lang = language_manager.get_language("python3")
         self.source = GtkSource.Buffer.new_with_language(python_lang)
         self.source.set_style_scheme(
@@ -88,8 +102,9 @@ class MainWindow:
         self.ui["script_editor"].set_show_line_numbers(True)
         self.ui["script_editor"].set_show_right_margin(True)
         self.ui["script_editor"].set_tab_width(4)
-        self.ui["proc_box"].add1(self.ui["script_editor"])
-        self.ui["proc_box"].add2(self.ui["script_result"])
+        self.ui["script_editor"].set_size_request(400, -1)
+        self.ui["script_container"].add(self.ui["script_editor"])
+        self.ui["proc_box"].add2(self.ui["script_result"].get_widget())
 
         # Setup dialogs
         self.ui["script_chooser"] = Gtk.FileChooserDialog(
@@ -109,11 +124,13 @@ class MainWindow:
 
         # Other flags
         self.previewing = False
+        self.script = Script()
 
         # Initialize camera with overlay
         self.camera = PiCamera()
         self.overlay_image = Image.open('%s/ui/overlay.png' % curdir)
         self.overlay_image = self.overlay_image.tostring()
+        self.captured_image = np.zeros((640, 480))
 
         self.ui["main_window"].show_all()
 
@@ -215,6 +232,15 @@ class MainWindow:
                  Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
             )
             self.ui["script_chooser"].add_filter(self.ui["python_filter"])
+        elif widget is self.ui["run_script"]:
+            sourcecode = self.source.get_text(
+                self.source.get_start_iter(),
+                self.source.get_end_iter(),
+                True
+            )
+            self.script.set_source(sourcecode)
+            self.script.execute(self.captured_image)
+            self.ui["script_result"].view_results(self.script)
 
     def on_menu(self, widget, *event):
         """Handle menu items."""

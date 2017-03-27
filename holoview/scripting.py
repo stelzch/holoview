@@ -34,22 +34,28 @@ Besides the modules, the script can use the following variables:
   - output_figs     - dict of matplotlib figures to display in HoloView
 """
 import logging
-import cv2
 import gi
 from gi.repository import Gtk
 
 gi.require_version('Gtk', '3.0')
 logger = logging.getLogger('HoloView')
+default_modules = [
+    "import cv2",
+    "import numpy as np",
+    "import PIL",
+    "import matplotlib.pyplot as plt"
+]
 
 
 class Script:
     """Representing a user-written script for image evaluation."""
 
-    def __init__(self, source=""):
+    def __init__(self, source="", import_lines=default_modules):
         """Create a new Script object."""
         self.source = source
-        self.figures = dict()
-        self.variables = dict()
+        self.output_vars = dict()
+        self.output_figs = dict()
+        self.import_lines = import_lines
 
     def set_source(self, source):
         """Set the scripts source code."""
@@ -59,32 +65,80 @@ class Script:
         """Get the scripts source code."""
         return self.source
 
-    def execute(self):
-        """Execute this script and store its results."""
-        pass
+    def get_results(self):
+        """Get the results of the script as tuple: (vars, figs)."""
+        return self.output_vars, self.output_figs
+
+    def execute(self, image):
+        """Execute this script and store its results.
+
+        Beforehand prepend the correct import lines and clean previous results.
+        """
+        # Prepare import-statements and global vars
+        self.image = image
+        self.width = image.shape[1]
+        self.height = image.shape[0]
+        script = self.source
+        script_globals = {
+            "image": self.image,
+            "width": self.width,
+            "height": self.height,
+            "output_vars": self.output_vars,
+            "output_figs": self.output_figs
+        }
+        for line in self.import_lines:
+            script = line + "\n" + script
+
+        # Clearing results
+        self.output_vars.clear()
+        self.output_figs.clear()
+        logger.debug("Running the following script:\n{}".format(script))
+
+        # Here we go
+        exec(script, script_globals)
+        logger.debug("Script left behind the following results:\n{}".format(
+            self.output_vars,
+            self.output_figs
+        ))
 
 
-class ScriptResultViewer(Gtk.Box):
+class ScriptResultViewer:
     """Present the results of a script."""
 
     def __init__(self):
         """Init."""
-        super(ScriptResultViewer, self).__init__()
+        self.box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
 
         # Init models
         self.variable_model = Gtk.ListStore(str, str)  # Model for variables
-        self.variable_model.append(["x", "1.0234"])
-        self.variable_model.append(["y", "5.2348"])
 
         # Init views
         self.ui = dict()
+        self.tabs = dict()
         self.ui["notebook"] = Gtk.Notebook.new()
         self.ui["variable_view"] = Gtk.TreeView(self.variable_model)
         self.ui["renderer1"] = Gtk.CellRendererText()
         self.ui["renderer2"] = Gtk.CellRendererText()
+
         var_name = Gtk.TreeViewColumn("Variable", self.ui["renderer1"], text=0)
         var_value = Gtk.TreeViewColumn("Value", self.ui["renderer2"], text=1)
         self.ui["variable_view"].append_column(var_name)
         self.ui["variable_view"].append_column(var_value)
 
-        self.pack_start(self.ui["variable_view"], True, True, 0)
+        self.box.pack_start(self.ui["variable_view"], True, True, 0)
+        self.box.pack_start(self.ui["notebook"], True, True, 0)
+
+    def get_widget(self):
+        """Get the widget."""
+        return self.box
+
+    def view_results(self, script):
+        """View the results of a given script."""
+        # Clear previous results
+        self.variable_model.clear()
+
+        variables, figs = script.get_results()
+
+        for key in variables:
+            print(key, ":", variables[key])
+            self.variable_model.append([str(key), str(variables[key])])

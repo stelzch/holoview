@@ -9,13 +9,14 @@ import gi
 import os
 import cv2
 import logging
-from gi.repository import Gtk
+from gi.repository import Gtk, GtkSource, GObject, GLib
 from PIL import Image
 from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
 
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
+docdir = GLib.get_user_special_dir(GLib.USER_DIRECTORY_DOCUMENTS)
 logger = logging.getLogger('HoloView')
 
 
@@ -24,12 +25,16 @@ class MainWindow:
 
     def __init__(self):
         """Initialize and show the MainWindow."""
+        # Register new types
+        GObject.type_register(GtkSource.View)
+
         # Initialize UI
         builder = Gtk.Builder()
         builder.add_from_file('%s/ui/mainwindow.glade' % curdir)
         self.ui = dict()
         self.ui["main_window"] = builder.get_object("main_window")
         self.ui["menu_quit"] = builder.get_object("menu_quit")
+        self.ui["menu_info"] = builder.get_object("menu_info")
         self.ui["brightness_spin"] = builder.get_object("brightness_spin")
         self.ui["contrast_spin"] = builder.get_object("contrast_spin")
         self.ui["saturation_spin"] = builder.get_object("saturation_spin")
@@ -40,11 +45,18 @@ class MainWindow:
         self.ui["capture_button"] = builder.get_object("capture_button")
         self.ui["tab_widget"] = builder.get_object("tab_widget")
         self.ui["resolution_combo"] = builder.get_object("resolution_combo")
+        self.ui["load_script"] = builder.get_object("load_script")
+        self.ui["save_script"] = builder.get_object("save_script")
+        self.ui["script_chooser"] = builder.get_object("script_chooser")
+        self.ui["script_saver"] = builder.get_object("script_saver")
+        self.ui["script_editor"] = builder.get_object("script_editor")
+        self.ui["about_dialog"] = builder.get_object("about_dialog")
 
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
         self.ui["main_window"].connect("key_release_event", self.on_key)
-        self.ui["menu_quit"].connect("activate", self.end)
+        self.ui["menu_quit"].connect("activate", self.on_menu)
+        self.ui["menu_info"].connect("activate", self.on_menu)
         self.ui["capture_button"].connect("clicked", self.start_capture)
         self.ui["brightness_adjus"].connect("value-changed",
                                             self.capture_param_changed)
@@ -54,9 +66,34 @@ class MainWindow:
                                             self.capture_param_changed)
         self.ui["resolution_combo"].connect("changed",
                                             self.on_resolution_change)
+        self.ui["load_script"].connect("clicked", self.on_toolbar)
+        self.ui["save_script"].connect("clicked", self.on_toolbar)
+        self.ui["python_filter"] = builder.get_object("python_filter")
+        self.ui["python_filter"].set_name("Python files")
+
+        """ This is a textbuffer containing the source typed in the
+        sourceview editor."""
+        self.source = builder.get_object("source")
+
+        # Setup dialogs
+        self.ui["script_chooser"] = Gtk.FileChooserDialog(
+            "Choose a script file",
+            None, Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+        )
+        self.ui["script_saver"] = Gtk.FileChooserDialog(
+            "Save to file",
+            None, Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+        )
+        self.ui["script_saver"].add_filter(self.ui["python_filter"])
+        self.ui["script_chooser"].add_filter(self.ui["python_filter"])
 
         # Other flags
         self.previewing = False
+        self.source.set_text("Hello World")
 
         # Initialize camera with overlay
         self.camera = PiCamera()
@@ -120,7 +157,58 @@ class MainWindow:
         logger.info("Setting resolution to {}x{}".format(width, height))
         self.camera.resolution = (int(width), int(height))
 
-    def end(self, widget, *data):
+    def on_toolbar(self, widget):
+        """Handle toolbar buttons in the `Processing` tab."""
+        if widget is self.ui["save_script"]:
+            """ This code snippet opens a filechooser in SAVE mode
+            so the user can select a destination for the file.
+            """
+            res = self.ui["script_saver"].run()
+            if res == Gtk.ResponseType.OK:
+                filename = self.ui["script_saver"].get_filename()
+                logger.info("Saving script to {}".format(filename))
+                with open(filename, 'w') as file:
+                    file.write(self.source.get_text(
+                        self.source.get_start_iter(),
+                        self.source.get_end_iter(),
+                        True)
+                    )
+            self.ui["script_saver"].destroy()
+            self.ui["script_saver"] = Gtk.FileChooserDialog(
+                "Save to file",
+                None, Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+            )
+
+        elif widget is self.ui["load_script"]:
+            """ Here a filechooser is opened to let the user choose a file.
+            Its content is then loaded into the GtkSourceView."""
+            res = self.ui["script_chooser"].run()
+            if res == Gtk.ResponseType.OK:
+                filename = self.ui["script_chooser"].get_filename()
+                logger.info("Loading script from {}".format(filename))
+                with open(filename, 'r') as file:
+                    self.source.set_text(file.read())
+            self.ui["script_chooser"].destroy()
+            """Workaround: if the file dialogs are not created before each
+            call, they are not correctly displayed..."""
+            self.ui["script_chooser"] = Gtk.FileChooserDialog(
+                "Choose a script file",
+                None, Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            )
+
+    def on_menu(self, widget, *event):
+        """Handle menu items."""
+        if widget is self.ui["menu_quit"]:
+            self.end()
+        elif widget is self.ui["menu_info"]:
+            self.ui["about_dialog"].run()
+            self.ui["about_dialog"].destroy()
+
+    def end(self, *args):
         """Stop any running capture and end program."""
         Gtk.main_quit()
 

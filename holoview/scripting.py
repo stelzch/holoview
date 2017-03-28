@@ -37,15 +37,14 @@ import gi
 from gi.repository import Gtk
 import matplotlib
 import logging
+import numpy as np
+import PIL
+import matplotlib.pyplot as plt
+import cv2
 
 matplotlib.use("Gtk3Agg")
 gi.require_version('Gtk', '3.0')
 logger = logging.getLogger('HoloView')
-default_modules = [
-    "import numpy as np",
-    "import PIL",
-    "import matplotlib.pyplot as plt"
-]
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
@@ -53,14 +52,11 @@ from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCan
 class Script:
     """Representing a user-written script for image evaluation."""
 
-    def __init__(self, source="", import_lines=default_modules):
+    def __init__(self, source=""):
         """Create a new Script object."""
         self.source = source
-        self.output_vars = {
-        "test":"var"
-        }
+        self.output_vars = dict()
         self.output_figs = dict()
-        self.import_lines = import_lines
 
     def set_source(self, source):
         """Set the scripts source code."""
@@ -89,10 +85,12 @@ class Script:
             "width": self.width,
             "height": self.height,
             "output_vars": self.output_vars,
-            "output_figs": self.output_figs
+            "output_figs": self.output_figs,
+            "plt": plt,
+            "PIL": PIL,
+            "np": np,
+            "cv2": cv2
         }
-        for line in self.import_lines:
-            script = line + "\n" + script
 
         # Clearing results
         self.output_vars.clear()
@@ -160,4 +158,7 @@ class ScriptResultViewer:
 
                 self.tabs[key] = sw
                 self.ui["notebook"].append_page(sw, Gtk.Label.new(key))
-                self.ui["notebook"].show_all()
+
+                # For debug only: export the figures as files to the current dir
+                # figs[key].savefig(key + ".ps")
+        self.ui["notebook"].show_all()

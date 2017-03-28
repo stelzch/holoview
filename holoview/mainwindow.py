@@ -53,6 +53,12 @@ class MainWindow:
         self.ui["load_script"] = builder.get_object("load_script")
         self.ui["save_script"] = builder.get_object("save_script")
         self.ui["run_script"] = builder.get_object("run_script")
+        self.ui["export_figure"] = builder.get_object("export_figure")
+        self.ui["python_filter"] = builder.get_object("python_filter")
+        self.ui["jpeg_filter"] = builder.get_object("jpeg_filter")
+        self.ui["png_filter"] = builder.get_object("png_filter")
+        self.ui["svg_filter"] = builder.get_object("svg_filter")
+        self.ui["postscript_filter"] = builder.get_object("postscript_filter")
         self.ui["script_result"] = ScriptResultViewer()
 
         # Connect signals
@@ -72,10 +78,15 @@ class MainWindow:
         self.ui["load_script"].connect("clicked", self.on_toolbar)
         self.ui["save_script"].connect("clicked", self.on_toolbar)
         self.ui["run_script"].connect("clicked", self.on_toolbar)
-        self.ui["python_filter"] = builder.get_object("python_filter")
-        self.ui["python_filter"].set_name("Python files")
+        self.ui["export_figure"].connect("clicked", self.on_toolbar)
+        self.ui["python_filter"].set_name("Python scripts")
+        self.ui["jpeg_filter"].set_name("JPEG images")
+        self.ui["png_filter"].set_name("PNG images")
+        self.ui["svg_filter"].set_name("SVG images")
+        self.ui["postscript_filter"].set_name("Postscript documents")
         self.ui["script_container"] = builder.get_object(
             "script_editor_container")
+        self.create_dialog("all")
 
         """ This is a textbuffer containing the source typed in the
         sourceview editor."""
@@ -106,22 +117,6 @@ class MainWindow:
         self.ui["script_editor"].set_size_request(400, -1)
         self.ui["script_container"].add(self.ui["script_editor"])
         self.ui["proc_box"].add2(self.ui["script_result"].get_widget())
-
-        # Setup dialogs
-        self.ui["script_chooser"] = Gtk.FileChooserDialog(
-            "Choose a script file",
-            None, Gtk.FileChooserAction.OPEN,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-             Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
-        )
-        self.ui["script_saver"] = Gtk.FileChooserDialog(
-            "Save to file",
-            None, Gtk.FileChooserAction.SAVE,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-             Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
-        )
-        self.ui["script_saver"].add_filter(self.ui["python_filter"])
-        self.ui["script_chooser"].add_filter(self.ui["python_filter"])
 
         # Other flags
         self.previewing = False
@@ -207,13 +202,8 @@ class MainWindow:
                         True)
                     )
             self.ui["script_saver"].destroy()
-            self.ui["script_saver"] = Gtk.FileChooserDialog(
-                "Save to file",
-                None, Gtk.FileChooserAction.SAVE,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
-            )
-            self.ui["script_saver"].add_filter(self.ui["python_filter"])
+            self.create_dialog("script_saver")  # Recreate the dialog
+
         elif widget is self.ui["load_script"]:
             """ Here a filechooser is opened to let the user choose a file.
             Its content is then loaded into the GtkSourceView."""
@@ -224,15 +214,28 @@ class MainWindow:
                 with open(filename, 'r') as file:
                     self.source.set_text(file.read())
             self.ui["script_chooser"].destroy()
-            """Workaround: if the file dialogs are not created before each
-            call, they are not correctly displayed..."""
-            self.ui["script_chooser"] = Gtk.FileChooserDialog(
-                "Choose a script file",
-                None, Gtk.FileChooserAction.OPEN,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
-            )
-            self.ui["script_chooser"].add_filter(self.ui["python_filter"])
+            self.create_dialog("script_chooser")  # Recreate the dialog
+
+        elif widget is self.ui["export_figure"]:
+            if self.ui["script_result"].number_figures() is not 0:
+                res = self.ui["figure_exporter"].run()
+                if res == Gtk.ResponseType.OK:
+                    filename = self.ui["figure_exporter"].get_filename()
+                    self.ui["script_result"].export_figure(filename)
+                self.ui["figure_exporter"].destroy()
+                self.create_dialog("figure_exporter")  # Recreate the dialog
+            else:
+                # No figure was shown, display error message
+                dialog = Gtk.MessageDialog(
+                    self.ui["main_window"], None, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL, "No figure"
+                )
+                dialog.format_secondary_text(
+                    "There was no figure selected when you hit that export button!"
+                )
+                dialog.run()
+                dialog.destroy()
+
         elif widget is self.ui["run_script"]:
             sourcecode = self.source.get_text(
                 self.source.get_start_iter(),
@@ -250,6 +253,37 @@ class MainWindow:
         elif widget is self.ui["menu_info"]:
             self.ui["about_dialog"].run()
             self.ui["about_dialog"].destroy()
+
+    def create_dialog(self, name):
+        """Create the dialog with given name."""
+        if name is "script_chooser" or (name is "all"):
+            self.ui["script_chooser"] = Gtk.FileChooserDialog(
+                "Choose a script file",
+                None, Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            )
+            self.ui["script_chooser"].add_filter(self.ui["python_filter"])
+        if name is "script_saver" or (name is "all"):
+            self.ui["script_saver"] = Gtk.FileChooserDialog(
+                "Save to file",
+                None, Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+            )
+            self.ui["script_saver"].add_filter(self.ui["python_filter"])
+            self.ui["script_saver"].set_do_overwrite_confirmation(True)
+        if name is "figure_exporter" or (name is "all"):
+            self.ui["figure_exporter"] = Gtk.FileChooserDialog(
+                "Save to file",
+                None, Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+            )
+            self.ui["figure_exporter"].add_filter(self.ui["jpeg_filter"])
+            self.ui["figure_exporter"].add_filter(self.ui["png_filter"])
+            self.ui["figure_exporter"].add_filter(self.ui["svg_filter"])
+            self.ui["figure_exporter"].add_filter(self.ui["postscript_filter"])
 
     def end(self, *args):
         """Stop any running capture and end program."""

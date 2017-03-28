@@ -39,7 +39,6 @@ import matplotlib
 import logging
 import numpy as np
 import PIL
-import matplotlib.pyplot as plt
 import cv2
 
 matplotlib.use("Gtk3Agg")
@@ -48,6 +47,7 @@ logger = logging.getLogger('HoloView')
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+
 
 class Script:
     """Representing a user-written script for image evaluation."""
@@ -110,16 +110,20 @@ class ScriptResultViewer:
 
     def __init__(self):
         """Init."""
-        self.box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
+        self.box = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
 
         # Init models
         self.variable_model = Gtk.ListStore(str, str)  # Model for variables
+        self.figures = dict()
 
         # Init views
         self.ui = dict()
         self.tabs = dict()
         self.ui["notebook"] = Gtk.Notebook.new()
+        self.ui["notebook"].append_page(Gtk.Label("Start writing"),
+                                        Gtk.Label("Empty"))
         self.ui["variable_view"] = Gtk.TreeView(self.variable_model)
+        self.ui["variable_view"].set_headers_clickable(True)
         self.ui["renderer1"] = Gtk.CellRendererText()
         self.ui["renderer2"] = Gtk.CellRendererText()
 
@@ -128,8 +132,12 @@ class ScriptResultViewer:
         self.ui["variable_view"].append_column(var_name)
         self.ui["variable_view"].append_column(var_value)
 
-        # self.box.pack_start(self.ui["variable_view"], True, True, 0)
-        self.box.pack_start(self.ui["notebook"], True, True, 0)
+        sw = Gtk.ScrolledWindow()
+        sw.add_with_viewport(self.ui["variable_view"])
+
+        self.box.add1(self.ui["notebook"])
+        self.box.add2(sw)
+        self.box.set_position(400)
 
     def get_widget(self):
         """Get the widget."""
@@ -143,14 +151,12 @@ class ScriptResultViewer:
             self.ui["notebook"].remove_page(0)
 
         variables, figs = script.get_results()
-        print(figs)
+        self.figures = figs
 
         for key in variables:
-            print(key, ":", variables[key])
             self.variable_model.append([str(key), str(variables[key])])
         for key in figs:
             if type(figs[key]) is matplotlib.figure.Figure:
-                print(figs)
                 logger.info("Processing figure {}".format(key))
                 sw = Gtk.ScrolledWindow()
                 canvas = FigureCanvas(figs[key])
@@ -158,7 +164,19 @@ class ScriptResultViewer:
 
                 self.tabs[key] = sw
                 self.ui["notebook"].append_page(sw, Gtk.Label.new(key))
-
-                # For debug only: export the figures as files to the current dir
-                # figs[key].savefig(key + ".ps")
         self.ui["notebook"].show_all()
+
+    def number_figures(self):
+        """Return the number of figures that are currently displayed."""
+        return len(self.figures)
+
+    def export_figure(self, filename):
+        """Export the currently displayed figure to filename."""
+        if len(self.figures) is not 0:
+            current_tab = self.ui["notebook"].get_current_page()
+            logger.info("Exporting figure {} to file {}".format(current_tab + 1,
+                                                                filename))
+            fig = list(self.figures.values())[current_tab]
+            fig.savefig(filename)
+        else:
+            logger.error("export_figure called, but no figures visible")

@@ -16,7 +16,6 @@ from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
 from holoview.scripting import ScriptResultViewer, Script
 
-
 gi.require_version('Gtk', '3.0')
 curdir = os.path.dirname(os.path.abspath(__file__))
 docdir = GLib.get_user_special_dir(GLib.USER_DIRECTORY_DOCUMENTS)

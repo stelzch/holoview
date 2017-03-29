@@ -115,6 +115,7 @@ class ScriptResultViewer:
         # Init models
         self.variable_model = Gtk.ListStore(str, str)  # Model for variables
         self.figures = dict()
+        self.figure_widgets = dict()
 
         # Init views
         self.ui = dict()
@@ -147,6 +148,10 @@ class ScriptResultViewer:
         """View the results of a given script."""
         # Clear previous results
         self.variable_model.clear()
+        for i in self.figures:
+            plt.close(self.figures[i])
+            self.figure_widgets[i].destroy()
+            self.figure_widgets.pop(i)
         while self.ui["notebook"].get_n_pages() is not 0:
             self.ui["notebook"].remove_page(0)
 
@@ -160,6 +165,7 @@ class ScriptResultViewer:
                 logger.info("Processing figure {}".format(key))
                 sw = Gtk.ScrolledWindow()
                 canvas = FigureCanvas(figs[key])
+                self.figure_widgets[key] = canvas
                 sw.add_with_viewport(canvas)
 
                 self.tabs[key] = sw

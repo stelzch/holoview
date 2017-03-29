@@ -334,7 +334,7 @@ Niklas Jacobs</property>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Auflösung</property>
+                        <property name="label" translatable="yes">Resolution</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>

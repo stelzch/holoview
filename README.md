@@ -2,7 +2,17 @@
 A image capturing program for the Raspberry Pi with included image analysis & manipulation power.
 
 ## Installation
-Download the most recent .deb file from the github-releases [page](https://github.com/stelzch/holoview/releases) on the Pi. Then install it using `sudo dpkg -i version_you_downloaded.deb` in the terminal.
+Add the following line to your `/etc/apt/sources.list`-file,
+```
+deb http://debian.ch-st.de/ jessie main
+```
+and then execute these commands:
+```shell
+curl https://debian.ch-st.de/E622EA3.pub | sudo apt-key add -
+sudo apt update
+sudo apt install python3-holoview
+```
+That's it! Using the `holoview`-executable you can start the program.
 
 ## Contribution
 Currently, you help us the most when just testing stuff from the master branch. Open github issues if you encounter any bugs. Thanks!

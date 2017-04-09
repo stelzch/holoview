@@ -68,6 +68,11 @@ class MainWindow:
         self.ui["postscript_filter"] = builder.get_object("postscript_filter")
         self.ui["script_result"] = ScriptResultViewer()
 
+        # Additional props
+        self.ui["awb_red_spin"].set_visible(False)
+        self.ui["awb_blue_spin"].set_visible(False)
+        self.ui["awb_gains_label"].set_visible(False)
+
         # Connect signals
         self.ui["main_window"].connect("delete-event", self.end)
         self.ui["main_window"].connect("key_release_event", self.on_key)

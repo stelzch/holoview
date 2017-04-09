@@ -325,7 +325,7 @@ Niklas Jacob</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="capture_button">
-                        <property name="label" translatable="yes">Capture</property>
+                        <property name="label" translatable="yes">Preview</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -337,6 +337,7 @@ Niklas Jacob</property>
                         <property name="margin_bottom">2</property>
                         <property name="image">record_image</property>
                         <property name="always_show_image">True</property>
+                        <accelerator key="p" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -431,6 +432,7 @@ Niklas Jacob</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkSpinButton" id="awb_red_spin">
+                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="margin_left">3</property>
                             <property name="margin_right">3</property>
@@ -447,6 +449,7 @@ Niklas Jacob</property>
                         </child>
                         <child>
                           <object class="GtkSpinButton" id="awb_blue_spin">
+                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="margin_left">3</property>
                             <property name="margin_right">3</property>

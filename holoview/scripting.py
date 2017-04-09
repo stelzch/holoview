@@ -48,7 +48,6 @@ logger = logging.getLogger('HoloView')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
-
 class Script:
     """Representing a user-written script for image evaluation."""
 

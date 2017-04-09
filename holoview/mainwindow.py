@@ -135,7 +135,7 @@ class MainWindow:
         if current_tab is 0 and not self.previewing:
             self.camera.start_preview()
             self.overlay = self.camera.add_overlay(self.overlay_image,
-                                                   size=(1920, 1080),
+                                                   size=(1920, 1088),
                                                    format='rgba',
                                                    layer=4)
             logger.info("Viewfinder started")

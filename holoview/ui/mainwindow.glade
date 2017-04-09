@@ -39,7 +39,7 @@ THE SOFTWARE.
     <property name="authors">Christoph Stelz
 Daniel Bücheler
 Timo Knaack
-Niklas Jacobs</property>
+Niklas Jacob</property>
     <property name="logo_icon_name">image-x-generic</property>
     <property name="license_type">mit-x11</property>
     <child internal-child="vbox">
@@ -72,6 +72,18 @@ Niklas Jacobs</property>
     <child>
       <placeholder/>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="awb_blue_adjus">
+    <property name="upper">8</property>
+    <property name="value">1.5</property>
+    <property name="step_increment">0.050000000000000003</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="awb_red_adjus">
+    <property name="upper">8</property>
+    <property name="value">1.5</property>
+    <property name="step_increment">0.050000000000000003</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkAdjustment" id="brightness_adjus">
     <property name="upper">100</property>
@@ -213,6 +225,7 @@ Niklas Jacobs</property>
               <object class="GtkPaned" id="capture_pane">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="position">238</property>
                 <child>
                   <object class="GtkGrid">
                     <property name="visible">True</property>
@@ -283,7 +296,7 @@ Niklas Jacobs</property>
                         <property name="adjustment">contrast_adjus</property>
                         <property name="numeric">True</property>
                         <property name="update_policy">if-valid</property>
-                        <property name="value">49</property>
+                        <property name="value">50</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -303,7 +316,7 @@ Niklas Jacobs</property>
                         <property name="adjustment">saturation_adjus</property>
                         <property name="numeric">True</property>
                         <property name="update_policy">if-valid</property>
-                        <property name="value">49</property>
+                        <property name="value">50</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -327,7 +340,7 @@ Niklas Jacobs</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
-                        <property name="top_attach">4</property>
+                        <property name="top_attach">7</property>
                       </packing>
                     </child>
                     <child>
@@ -345,6 +358,10 @@ Niklas Jacobs</property>
                       <object class="GtkComboBoxText" id="resolution_combo">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
                         <property name="active">1</property>
                         <items>
                           <item translatable="yes">640x480</item>
@@ -356,6 +373,131 @@ Niklas Jacobs</property>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">AWB Mode</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="awb_mode_combo">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
+                        <property name="active">0</property>
+                        <property name="active_id">auto</property>
+                        <items>
+                          <item id="auto" translatable="yes">auto</item>
+                          <item id="off" translatable="yes">off</item>
+                          <item id="sunlight" translatable="yes">sunlight</item>
+                          <item id="cloudy" translatable="yes">cloudy</item>
+                          <item id="shade" translatable="yes">shade</item>
+                          <item id="tungsten" translatable="yes">tungsten</item>
+                          <item id="fluorescent" translatable="yes">fluorescent</item>
+                          <item id="incandescent" translatable="yes">incandescent</item>
+                          <item id="flash" translatable="yes">flash</item>
+                          <item id="horizon" translatable="yes">horizon</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="awb_gains_label">
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">AWB Gains</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkSpinButton" id="awb_red_spin">
+                            <property name="can_focus">True</property>
+                            <property name="margin_left">3</property>
+                            <property name="margin_right">3</property>
+                            <property name="margin_top">3</property>
+                            <property name="margin_bottom">3</property>
+                            <property name="adjustment">awb_red_adjus</property>
+                            <property name="digits">2</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="awb_blue_spin">
+                            <property name="can_focus">True</property>
+                            <property name="margin_left">3</property>
+                            <property name="margin_right">3</property>
+                            <property name="margin_top">3</property>
+                            <property name="margin_bottom">3</property>
+                            <property name="adjustment">awb_blue_adjus</property>
+                            <property name="digits">2</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">DRC</property>
+                        <property name="wrap">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="drc_combo">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
+                        <property name="active_id">off</property>
+                        <items>
+                          <item id="off" translatable="yes">off</item>
+                          <item id="low" translatable="yes">low</item>
+                          <item id="medium" translatable="yes">medium</item>
+                          <item id="high" translatable="yes">high</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">6</property>
                       </packing>
                     </child>
                     <child>

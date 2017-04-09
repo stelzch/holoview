@@ -37,16 +37,24 @@ class MainWindow:
         self.ui["main_window"] = builder.get_object("main_window")
         self.ui["menu_quit"] = builder.get_object("menu_quit")
         self.ui["menu_info"] = builder.get_object("menu_info")
+        # Camera Parameters
         self.ui["brightness_spin"] = builder.get_object("brightness_spin")
         self.ui["contrast_spin"] = builder.get_object("contrast_spin")
         self.ui["saturation_spin"] = builder.get_object("saturation_spin")
+        self.ui["resolution_combo"] = builder.get_object("resolution_combo")
         self.ui["brightness_adjus"] = builder.get_object("brightness_adjus")
         self.ui["contrast_adjus"] = builder.get_object("contrast_adjus")
         self.ui["saturation_adjus"] = builder.get_object("saturation_adjus")
+        self.ui["awb_mode_combo"] = builder.get_object("awb_mode_combo")
+        self.ui["awb_gains_label"] = builder.get_object("awb_gains_label")
+        self.ui["awb_red_spin"] = builder.get_object("awb_red_spin")
+        self.ui["awb_red_adjus"] = builder.get_object("awb_red_adjus")
+        self.ui["awb_blue_adjus"] = builder.get_object("awb_blue_adjus")
+        self.ui["awb_blue_spin"] = builder.get_object("awb_blue_spin")
+        self.ui["drc_combo"] = builder.get_object("drc_combo")
         self.ui["capture_image"] = builder.get_object("capture_image")
         self.ui["capture_button"] = builder.get_object("capture_button")
         self.ui["tab_widget"] = builder.get_object("tab_widget")
-        self.ui["resolution_combo"] = builder.get_object("resolution_combo")
         self.ui["about_dialog"] = builder.get_object("about_dialog")
         self.ui["proc_box"] = builder.get_object("proc_box")
         self.ui["load_script"] = builder.get_object("load_script")
@@ -74,6 +82,13 @@ class MainWindow:
                                             self.capture_param_changed)
         self.ui["resolution_combo"].connect("changed",
                                             self.on_resolution_change)
+        self.ui["awb_mode_combo"].connect("changed",
+                                          self.capture_param_changed)
+        self.ui["awb_red_adjus"].connect("value-changed",
+                                         self.capture_param_changed)
+        self.ui["awb_blue_adjus"].connect("value-changed",
+                                          self.capture_param_changed)
+        self.ui["drc_combo"].connect("changed", self.capture_param_changed)
         self.ui["load_script"].connect("clicked", self.on_toolbar)
         self.ui["save_script"].connect("clicked", self.on_toolbar)
         self.ui["run_script"].connect("clicked", self.on_toolbar)
@@ -155,6 +170,28 @@ class MainWindow:
             value = int(widget.get_value() * 2 - 100)
             self.camera.saturation = value
             logger.info("Setting saturation to {}".format(value))
+        elif widget in [self.ui["awb_red_adjus"], self.ui["awb_blue_adjus"]]:
+            rval = self.ui["awb_red_adjus"].get_value()
+            bval = self.ui["awb_blue_adjus"].get_value()
+            self.camera.awb_gains = (rval, bval)
+            logger.info("Setting awb_gains to ({},{})".format(rval, bval))
+        elif widget is self.ui["awb_mode_combo"]:
+            value = widget.get_active_text()
+            self.camera.awb_mode = value
+            logger.info("Setting awb_mode to {}".format(value))
+            if value == 'off':
+                self.ui["awb_red_spin"].set_visible(True)
+                self.ui["awb_blue_spin"].set_visible(True)
+                self.ui["awb_gains_label"].set_visible(True)
+            else:
+                # Hide the awb gains controls, as they have no effect
+                self.ui["awb_red_spin"].set_visible(False)
+                self.ui["awb_blue_spin"].set_visible(False)
+                self.ui["awb_gains_label"].set_visible(False)
+        elif widget is self.ui["drc_combo"]:
+            val = widget.get_active_text()
+            logger.info("Setting drc_strength to {}".format(val))
+            self.camera.drc_strength = val
 
     def on_key(self, widget, event):
         """Handle incoming key events."""
@@ -230,7 +267,8 @@ class MainWindow:
                     Gtk.ButtonsType.CANCEL, "No figure"
                 )
                 dialog.format_secondary_text(
-                    "There was no figure selected when you hit that export button!"
+                    "There was no figure selected when " +
+                    "you hit that export button!"
                 )
                 dialog.run()
                 dialog.destroy()

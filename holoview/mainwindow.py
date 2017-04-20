@@ -53,6 +53,7 @@ class MainWindow(GObject.GObject):
         self.ui['awb_blue_adjus'] = builder.get_object('awb_blue_adjus')
         self.ui['awb_blue_spin'] = builder.get_object('awb_blue_spin')
         self.ui['drc_combo'] = builder.get_object('drc_combo')
+        self.ui['iso_combo'] = builder.get_object('iso_combo')
         self.ui['capture_image'] = builder.get_object('capture_image')
         self.ui['capture_button'] = builder.get_object('capture_button')
         self.ui['tab_widget'] = builder.get_object('tab_widget')
@@ -95,6 +96,7 @@ class MainWindow(GObject.GObject):
         self.ui['awb_blue_adjus'].connect('value-changed',
                                           self.capture_param_changed)
         self.ui['drc_combo'].connect('changed', self.capture_param_changed)
+        self.ui['iso_combo'].connect('changed', self.capture_param_changed)
         self.ui['load_script'].connect('clicked', self.on_toolbar)
         self.ui['save_script'].connect('clicked', self.on_toolbar)
         self.ui['run_script'].connect('clicked', self.on_toolbar)
@@ -198,9 +200,13 @@ class MainWindow(GObject.GObject):
                 self.ui['awb_blue_spin'].set_visible(False)
                 self.ui['awb_gains_label'].set_visible(False)
         elif widget is self.ui['drc_combo']:
-            val = widget.get_active_text()
+            val = widget.get_active_id()
             logger.info('Setting drc_strength to {}'.format(val))
             self.camera.drc_strength = val
+        elif widget is self.ui['iso_combo']:
+            val = int(widget.get_active_id())
+            logger.info('Setting iso to {}'.format(val))
+            self.camera.iso = val
 
     def on_key(self, widget, event):
         """Handle incoming key events."""

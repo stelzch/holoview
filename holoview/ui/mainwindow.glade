@@ -341,7 +341,7 @@ Niklas Jacob</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
-                        <property name="top_attach">7</property>
+                        <property name="top_attach">8</property>
                       </packing>
                     </child>
                     <child>
@@ -501,6 +501,42 @@ Niklas Jacob</property>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">ISO</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="iso_combo">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
+                        <property name="active_id">0</property>
+                        <items>
+                          <item id="0" translatable="yes">auto</item>
+                          <item id="100" translatable="yes">100</item>
+                          <item id="200" translatable="yes">200</item>
+                          <item id="320" translatable="yes">320</item>
+                          <item id="400" translatable="yes">400</item>
+                          <item id="500" translatable="yes">500</item>
+                          <item id="640" translatable="yes">640</item>
+                          <item id="800" translatable="yes">800</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">7</property>
                       </packing>
                     </child>
                     <child>
@@ -734,47 +770,6 @@ Niklas Jacob</property>
     </child>
   </object>
   <object class="GtkTextBuffer" id="source"/>
-  <object class="GtkWindow" id="splash_screen">
-    <property name="can_focus">False</property>
-    <property name="window_position">center</property>
-    <property name="default_width">300</property>
-    <property name="default_height">150</property>
-    <property name="type_hint">splashscreen</property>
-    <property name="decorated">False</property>
-    <child>
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">10</property>
-            <property name="margin_right">10</property>
-            <property name="margin_top">30</property>
-            <property name="margin_bottom">20</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="label" translatable="yes">&lt;span font="10"&gt;Initializing...&lt;/span&gt;
-&lt;span font="Impact Bold 20"&gt;HoloView&lt;/span&gt;</property>
-            <property name="use_markup">True</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkFileFilter" id="svg_filter">
     <mime-types>
       <mime-type>image/svg+xml</mime-type>

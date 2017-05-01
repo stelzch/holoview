@@ -197,7 +197,7 @@ class MainWindow(GObject.GObject):
         elif widget is self.ui['awb_mode_combo']:
             value = widget.get_active_text()
             if value not in PiCamera.AWB_MODES:
-            logger.error('Invalid awb_mode: {}'.format(value))
+                logger.error('Invalid awb_mode: {}'.format(value))
             self.camera.awb_mode = value
             logger.info('Setting awb_mode to {}'.format(value))
             if value == 'off':

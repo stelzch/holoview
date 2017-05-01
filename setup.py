@@ -12,7 +12,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(name='holoview',
-      version='0.0.2',
+      version='0.0.3',
       description='Holographic Image Viewer',
       author='Christoph Stelz',
       author_email='mail@ch-st.de',

@@ -29,9 +29,12 @@ setup(name='holoview',
       keywords='holography open science',
       packages=find_packages(),
       install_requires=[],
+      include_package_data=True,
       package_data={
       },
-      include_package_data=True,
+      data_files=[
+          ('share/applications', ['data/holoview.desktop'])
+      ],
       entry_points={
           'console_scripts': [
               'holoview=holoview:main'

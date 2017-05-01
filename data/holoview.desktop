@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=HoloView
+Comment=A holographic image capturing and manipulation program for the Raspberry Pi intended for the HolMOS Project
+Exec=/usr/bin/holoview
+Terminal=true
+Categories=Education;

@@ -54,6 +54,8 @@ class MainWindow(GObject.GObject):
         self.ui['awb_blue_spin'] = builder.get_object('awb_blue_spin')
         self.ui['drc_combo'] = builder.get_object('drc_combo')
         self.ui['iso_combo'] = builder.get_object('iso_combo')
+        self.ui['shutter_adjus'] = builder.get_object('shutter_adjus')
+        self.ui['shutter_spin'] = builder.get_object('shutter_spin')
         self.ui['capture_image'] = builder.get_object('capture_image')
         self.ui['capture_button'] = builder.get_object('capture_button')
         self.ui['tab_widget'] = builder.get_object('tab_widget')
@@ -97,6 +99,8 @@ class MainWindow(GObject.GObject):
                                           self.capture_param_changed)
         self.ui['drc_combo'].connect('changed', self.capture_param_changed)
         self.ui['iso_combo'].connect('changed', self.capture_param_changed)
+        self.ui['shutter_adjus'].connect('value-changed',
+                                        self.capture_param_changed)
         self.ui['load_script'].connect('clicked', self.on_toolbar)
         self.ui['save_script'].connect('clicked', self.on_toolbar)
         self.ui['run_script'].connect('clicked', self.on_toolbar)
@@ -207,6 +211,10 @@ class MainWindow(GObject.GObject):
             val = int(widget.get_active_id())
             logger.info('Setting iso to {}'.format(val))
             self.camera.iso = val
+        elif widget is self.ui['shutter_adjus']:
+            val = int(widget.get_value())
+            logger.info('Setting shutter_speed to {}'.format(val))
+            self.camera.shutter_speed = val
 
     def on_key(self, widget, event):
         """Handle incoming key events."""

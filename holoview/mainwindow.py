@@ -5,6 +5,7 @@
 |     | . | | | | |  |  |__   |
 |__|__|___|_|_|_|_|_____|_____|
 """
+import math
 import gi
 gi.require_version('Gtk', '3.0')
 import os
@@ -237,11 +238,29 @@ class MainWindow(GObject.GObject):
         if self.previewing and event.keyval is ord('c'):
             # trigger capture
             self.camera.stop_preview()
-            # TODO: Capture to buffer, not to file
-            self.camera.capture('/tmp/image.jpg')
-            self.captured_image = cv2.imread('/tmp/image.jpg')
-            self.captured_image = cv2.cvtColor(self.captured_image,
-                                               cv2.COLOR_BGR2RGB)
+
+            """Initialize the captured image. However, the picam captures
+            raw images with a width of the nearest multiple of 32px from the
+            requested width and a height of the nearest multiple of 16px from
+            the request height. If we do not allocate the image accordingly
+            the capture will result in an error"""
+            target_width = self.camera.resolution.width
+            target_height = self.camera.resolution.height
+            capture_width = math.ceil(self.camera.resolution.width / 32) * 32
+            capture_height = math.ceil(self.camera.resolution.height / 16) * 16
+            self.captured_image = np.empty(
+                (capture_height, capture_width, 3),
+                dtype=np.uint8)
+            self.camera.capture(self.captured_image, format='rgb')
+            """Now reshape that again and remove the unused pixels"""
+            self.captured_image = self.captured_image.reshape((
+                capture_height, capture_width, 3
+            ))
+            self.captured_image = self.captured_image[:target_height,
+                                                      :target_width,
+                                                      :]
+            
+            """Convert to GdkPixbuf for displaying"""
             pixbuf = rgbarray2pixbuf(self.captured_image)
             self.ui['capture_image'].set_from_pixbuf(pixbuf)
             self.camera.remove_overlay(self.overlay)

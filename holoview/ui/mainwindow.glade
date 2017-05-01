@@ -97,11 +97,6 @@ Niklas Jacob</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="shutter_adjus">
-    <property name="upper">8000000</property>
-    <property name="step_increment">10</property>
-    <property name="page_increment">1000.0</property>
-  </object>
   <object class="GtkFileFilter" id="jpeg_filter">
     <mime-types>
       <mime-type>image/jpeg</mime-type>
@@ -147,6 +142,11 @@ Niklas Jacob</property>
     <property name="value">50</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="shutter_adjus">
+    <property name="upper">8000000</property>
+    <property name="step_increment">10</property>
+    <property name="page_increment">1000</property>
   </object>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="width_request">1000</property>
@@ -230,7 +230,7 @@ Niklas Jacob</property>
               <object class="GtkPaned" id="capture_pane">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="position">238</property>
+                <property name="position">248</property>
                 <child>
                   <object class="GtkGrid">
                     <property name="visible">True</property>
@@ -350,7 +350,7 @@ Niklas Jacob</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
-                        <property name="top_attach">9</property>
+                        <property name="top_attach">10</property>
                       </packing>
                     </child>
                     <child>
@@ -579,6 +579,48 @@ Niklas Jacob</property>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">8</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Exposure</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">9</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="exposure_combo">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Sets camera exposure. 'off' disables automatic gain control.</property>
+                        <property name="margin_left">3</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
+                        <property name="active">1</property>
+                        <items>
+                          <item id="off" translatable="yes">off</item>
+                          <item id="auto" translatable="yes">auto</item>
+                          <item id="night" translatable="yes">night</item>
+                          <item id="nightpreview" translatable="yes">nightpreview</item>
+                          <item id="backlight" translatable="yes">backlight</item>
+                          <item id="spotlight" translatable="yes">spotlight</item>
+                          <item id="sports" translatable="yes">sports</item>
+                          <item id="snow" translatable="yes">snow</item>
+                          <item id="beach" translatable="yes">beach</item>
+                          <item id="verylong" translatable="yes">verylong</item>
+                          <item id="fixedfps" translatable="yes">fixedfps</item>
+                          <item id="antishake" translatable="yes">antishake</item>
+                          <item id="fireworks" translatable="yes">fireworks</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">9</property>
                       </packing>
                     </child>
                     <child>

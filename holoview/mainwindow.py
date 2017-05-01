@@ -56,6 +56,7 @@ class MainWindow(GObject.GObject):
         self.ui['iso_combo'] = builder.get_object('iso_combo')
         self.ui['shutter_adjus'] = builder.get_object('shutter_adjus')
         self.ui['shutter_spin'] = builder.get_object('shutter_spin')
+        self.ui['exposure_combo'] = builder.get_object('exposure_combo')
         self.ui['capture_image'] = builder.get_object('capture_image')
         self.ui['capture_button'] = builder.get_object('capture_button')
         self.ui['tab_widget'] = builder.get_object('tab_widget')
@@ -101,6 +102,8 @@ class MainWindow(GObject.GObject):
         self.ui['iso_combo'].connect('changed', self.capture_param_changed)
         self.ui['shutter_adjus'].connect('value-changed',
                                         self.capture_param_changed)
+        self.ui['exposure_combo'].connect('changed',
+                                          self.capture_param_changed)
         self.ui['load_script'].connect('clicked', self.on_toolbar)
         self.ui['save_script'].connect('clicked', self.on_toolbar)
         self.ui['run_script'].connect('clicked', self.on_toolbar)
@@ -193,6 +196,8 @@ class MainWindow(GObject.GObject):
             logger.info('Setting awb_gains to ({},{})'.format(rval, bval))
         elif widget is self.ui['awb_mode_combo']:
             value = widget.get_active_text()
+            if value not in PiCamera.AWB_MODES:
+            logger.error('Invalid awb_mode: {}'.format(value))
             self.camera.awb_mode = value
             logger.info('Setting awb_mode to {}'.format(value))
             if value == 'off':
@@ -209,13 +214,23 @@ class MainWindow(GObject.GObject):
             logger.info('Setting drc_strength to {}'.format(val))
             self.camera.drc_strength = val
         elif widget is self.ui['iso_combo']:
-            val = int(widget.get_active_id())
+            try:
+                val = int(widget.get_active_id())
+            except ValueError:
+                logger.error('Invalid ISO value - not an integer')
+                return
             logger.info('Setting iso to {}'.format(val))
             self.camera.iso = val
         elif widget is self.ui['shutter_adjus']:
             val = int(widget.get_value())
             logger.info('Setting shutter_speed to {}'.format(val))
             self.camera.shutter_speed = val
+        elif widget is self.ui['exposure_combo']:
+            val = widget.get_active_id()
+            if val not in PiCamera.EXPOSURE_MODES:
+                logger.error('Invalid exposure_mode: {}'.format(val))
+            logger.info('Setting exposure_mode to {}'.format(val))
+            self.camera.exposure_mode = val
 
     def on_key(self, widget, event):
         """Handle incoming key events."""

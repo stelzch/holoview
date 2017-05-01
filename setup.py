@@ -30,7 +30,6 @@ setup(name='holoview',
       packages=find_packages(),
       install_requires=[],
       package_data={
-          'holoview': ['data/mainwindow.glade', 'data/overlay.png']
       },
       include_package_data=True,
       entry_points={

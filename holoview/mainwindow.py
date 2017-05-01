@@ -169,6 +169,7 @@ class MainWindow(GObject.GObject):
                                                    format='rgba',
                                                    layer=4)
             logger.info('Viewfinder started')
+            self.ui['capture_button'].grab_focus()
             self.previewing = True
 
     def capture_param_changed(self, widget):

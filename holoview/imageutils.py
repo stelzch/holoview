@@ -2,6 +2,9 @@
 
 import gi
 from gi.repository import GdkPixbuf, GLib
+from PIL import Image
+from io import BytesIO
+import numpy as np
 
 gi.require_version('Gtk', '3.0')
 
@@ -18,3 +21,26 @@ def rgbarray2pixbuf(array):
                                              width, height,
                                              width * 3)
     return pixbuf
+
+def rgbarray2bytes(array, format='PNG'):
+    """Get a RGB array as bytearray encoded in a certain format.
+
+    Keyword arguments:
+    array -- a RGB image stored in an ndarray
+    format -- string representing the format, e.g. PNG, JPEG, GIF, ...
+    """
+    tempImage = Image.fromarray(array, 'RGB')
+    output = BytesIO()
+    tempImage.save(output, format=format)
+    imgData = output.getvalue()
+    output.close()
+    return imgData
+
+def bytes2rgbarray(bytes):
+    """Get an RGB array from a bytearray encoded in certain format.
+
+    Keyword arguments:
+    bytes -- a bytearray which stores the image
+    """
+    buffer = BytesIO(bytes)
+    return np.array(Image.open(buffer))

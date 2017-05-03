@@ -123,6 +123,14 @@ Niklas Jacob</property>
       <pattern>*.eps</pattern>
     </patterns>
   </object>
+  <object class="GtkFileFilter" id="project_filter">
+    <mime-types>
+      <mime-type>application/zip</mime-type>
+    </mime-types>
+    <patterns>
+      <pattern>*.zip</pattern>
+    </patterns>
+  </object>
   <object class="GtkFileFilter" id="python_filter">
     <mime-types>
       <mime-type>text/plain</mime-type>
@@ -172,6 +180,22 @@ Niklas Jacob</property>
                   <object class="GtkMenu">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkMenuItem" id="menu_open">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Open Project</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menu_save">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Save Project</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
                     <child>
                       <object class="GtkSeparatorMenuItem">
                         <property name="visible">True</property>

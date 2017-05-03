@@ -1,11 +1,11 @@
+import logging
+from zipfile import ZipFile
+from PIL import Image
 import numpy as np
 import cv2
-import logging
-from io import BytesIO
 import matplotlib.pyplot as plt
-from PIL import Image
-from zipfile import ZipFile
 from holoview.scripting import Script
+from holoview.imageutils import rgbarray2bytes, bytes2rgbarray
 
 logger = logging.getLogger('HoloView')
 
@@ -80,13 +80,10 @@ class Project:
                                                   self.description)
         with ZipFile(path, 'w') as zipfile:
             zipfile.writestr('METADATA.txt', metadata)
+            sourcecode = self.script.get_source()
+            logger.debug('Source of code is {}'.format(sourcecode))
             zipfile.writestr('script.py', self.script.get_source())
-
-            tempImage = Image.fromarray(self.image, 'RGB')
-            output = BytesIO()
-            tempImage.save(output, format='PNG')
-            imgData = output.getvalue()
-            output.close()
+            imgData = rgbarray2bytes(self.image, 'PNG')
             zipfile.writestr('image.png', imgData)
 
     def load(self, path):
@@ -103,8 +100,7 @@ class Project:
             author = metadata[1][11:]
             desc = metadata[2]
             script_source = zipfile.read('script.py').decode()
-            buffer = BytesIO(zipfile.read('image.png'))
-            image = np.array(Image.open(buffer))
+            image = bytes2rgbarray(zipfile.read('image.png'))
             
         self.author = author
         self.title = title

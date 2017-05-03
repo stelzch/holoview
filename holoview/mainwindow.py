@@ -17,6 +17,7 @@ from PIL import Image
 from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
 from holoview.scripting import ScriptResultViewer, Script
+from holoview.project import Project
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 docdir = GLib.get_user_special_dir(GLib.USER_DIRECTORY_DOCUMENTS)
@@ -37,6 +38,8 @@ class MainWindow(GObject.GObject):
         builder.add_from_file('%s/ui/mainwindow.glade' % curdir)
         self.ui = dict()
         self.ui['main_window'] = builder.get_object('main_window')
+        self.ui['menu_open'] = builder.get_object('menu_open')
+        self.ui['menu_save'] = builder.get_object('menu_save')
         self.ui['menu_quit'] = builder.get_object('menu_quit')
         self.ui['menu_info'] = builder.get_object('menu_info')
         # Camera Parameters
@@ -71,6 +74,7 @@ class MainWindow(GObject.GObject):
         self.ui['jpeg_filter'] = builder.get_object('jpeg_filter')
         self.ui['png_filter'] = builder.get_object('png_filter')
         self.ui['svg_filter'] = builder.get_object('svg_filter')
+        self.ui['project_filter'] = builder.get_object('project_filter')
         self.ui['postscript_filter'] = builder.get_object('postscript_filter')
         self.ui['script_result'] = ScriptResultViewer()
 
@@ -82,6 +86,8 @@ class MainWindow(GObject.GObject):
         # Connect signals
         self.ui['main_window'].connect('delete-event', self.end)
         self.ui['main_window'].connect('key_release_event', self.on_key)
+        self.ui['menu_open'].connect('activate', self.on_menu)
+        self.ui['menu_save'].connect('activate', self.on_menu)
         self.ui['menu_quit'].connect('activate', self.on_menu)
         self.ui['menu_info'].connect('activate', self.on_menu)
         self.ui['capture_button'].connect('clicked', self.start_capture)
@@ -114,9 +120,9 @@ class MainWindow(GObject.GObject):
         self.ui['png_filter'].set_name('PNG images')
         self.ui['svg_filter'].set_name('SVG images')
         self.ui['postscript_filter'].set_name('Postscript documents')
+        self.ui['project_filter'].set_name('Project zip files')
         self.ui['script_container'] = builder.get_object(
             'script_editor_container')
-        self.create_dialog('all')
 
         """ This is a textbuffer containing the source typed in the
         sourceview editor."""
@@ -148,9 +154,10 @@ class MainWindow(GObject.GObject):
         self.ui['script_container'].add(self.ui['script_editor'])
         self.ui['proc_box'].add2(self.ui['script_result'].get_widget())
 
-        # Other flags
+        # Other flags/variables
         self.previewing = False
         self.script = Script()
+        self.project = Project()
 
         # Initialize camera with overlay
         self.camera = PiCamera()
@@ -285,22 +292,19 @@ class MainWindow(GObject.GObject):
             """ This code snippet opens a filechooser in SAVE mode
             so the user can select a destination for the file.
             """
+            self.create_dialog('script_saver')  # Recreate the dialog
             res = self.ui['script_saver'].run()
             if res == Gtk.ResponseType.OK:
                 filename = self.ui['script_saver'].get_filename()
                 logger.info('Saving script to {}'.format(filename))
                 with open(filename, 'w') as file:
-                    file.write(self.source.get_text(
-                        self.source.get_start_iter(),
-                        self.source.get_end_iter(),
-                        True)
-                    )
+                    file.write(self.get_sourcecode())
             self.ui['script_saver'].destroy()
-            self.create_dialog('script_saver')  # Recreate the dialog
 
         elif widget is self.ui['load_script']:
             """ Here a filechooser is opened to let the user choose a file.
             Its content is then loaded into the GtkSourceView."""
+            self.create_dialog('script_chooser')  # Recreate the dialog
             res = self.ui['script_chooser'].run()
             if res == Gtk.ResponseType.OK:
                 filename = self.ui['script_chooser'].get_filename()
@@ -308,16 +312,15 @@ class MainWindow(GObject.GObject):
                 with open(filename, 'r') as file:
                     self.source.set_text(file.read())
             self.ui['script_chooser'].destroy()
-            self.create_dialog('script_chooser')  # Recreate the dialog
 
         elif widget is self.ui['export_figure']:
             if self.ui['script_result'].number_figures() is not 0:
+                self.create_dialog('figure_exporter')  # Recreate the dialog
                 res = self.ui['figure_exporter'].run()
                 if res == Gtk.ResponseType.OK:
                     filename = self.ui['figure_exporter'].get_filename()
                     self.ui['script_result'].export_figure(filename)
                 self.ui['figure_exporter'].destroy()
-                self.create_dialog('figure_exporter')  # Recreate the dialog
             else:
                 # No figure was shown, display error message
                 dialog = Gtk.MessageDialog(
@@ -332,12 +335,7 @@ class MainWindow(GObject.GObject):
                 dialog.destroy()
 
         elif widget is self.ui['run_script']:
-            sourcecode = self.source.get_text(
-                self.source.get_start_iter(),
-                self.source.get_end_iter(),
-                True
-            )
-            self.script.set_source(sourcecode)
+            self.script.set_source(self.get_sourcecode())
             self.script.execute(self.captured_image)
             self.ui['script_result'].view_results(self.script)
 
@@ -348,6 +346,30 @@ class MainWindow(GObject.GObject):
         elif widget is self.ui['menu_info']:
             self.ui['about_dialog'].run()
             self.ui['about_dialog'].destroy()
+        elif widget is self.ui['menu_open']:
+            logger.info('Opening project file')
+            self.create_dialog('project_chooser')
+            res = self.ui['project_chooser'].run()
+            if res == Gtk.ResponseType.OK:
+                filename = self.ui['project_chooser'].get_filename()
+                self.project.load(filename)
+                self.script = self.project.get_script()
+                self.source.set_text(self.script.get_source())
+                self.captured_image = self.project.get_image()
+                pixbuf = rgbarray2pixbuf(self.captured_image)
+                self.ui['capture_image'].set_from_pixbuf(pixbuf)
+            self.ui['project_chooser'].destroy()
+        elif widget is self.ui['menu_save']:
+            logger.info('Saving project file')
+            self.create_dialog('project_saver')
+            res = self.ui['project_saver'].run()
+            if res == Gtk.ResponseType.OK:
+                self.project.set_image(self.captured_image)
+                self.script.set_source(self.get_sourcecode())
+                self.project.set_script(self.script)
+                filename = self.ui['project_saver'].get_filename()
+                self.project.save(filename)
+            self.ui['project_saver'].destroy()
 
     def create_dialog(self, name):
         """Create the dialog with given name."""
@@ -379,6 +401,27 @@ class MainWindow(GObject.GObject):
             self.ui['figure_exporter'].add_filter(self.ui['png_filter'])
             self.ui['figure_exporter'].add_filter(self.ui['svg_filter'])
             self.ui['figure_exporter'].add_filter(self.ui['postscript_filter'])
+        if name is 'project_chooser' or (name is 'all'):
+            self.ui['project_chooser'] = Gtk.FileChooserDialog(
+                'Choose project',
+                None, Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OPEN, Gtk.ResponseType.OK)
+            )
+            self.ui['project_chooser'].add_filter(self.ui['project_filter'])
+        if name is 'project_saver' or (name is 'all'):
+            self.ui['project_saver'] = Gtk.FileChooserDialog(
+                'Save project',
+                None, Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+            )
+            self.ui['project_saver'].add_filter(self.ui['project_filter'])
+
+    def get_sourcecode(self):
+        """Get the current source code entered in the editor."""
+        return self.source.get_text(self.source.get_start_iter(),
+                                    self.source.get_end_iter(), True)
 
     def end(self, *args):
         """Stop any running capture and end program."""

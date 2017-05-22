@@ -1,4 +1,5 @@
 import unittest
+import tempfile
 import numpy as np
 import cv2
 from matplotlib.figure import Figure
@@ -24,13 +25,13 @@ output_vars["pi"] = 3
 output_vars["boolVal"] = False
 output_vars["cvVersion"] = cv2.__version__""")
         self.script.execute(self.image)
-        vars, figs = self.script.get_results()
+        variables, figs = self.script.get_results()
         self.assertEqual(len(figs), 0)
-        self.assertEqual(len(vars), 4)
-        self.assertEqual(vars["testvar1"], 45.123455)
-        self.assertEqual(vars["pi"], 3)
-        self.assertEqual(vars["cvVersion"], cv2.__version__)
-        self.assertFalse(vars["boolVal"])
+        self.assertEqual(len(variables), 4)
+        self.assertEqual(variables["testvar1"], 45.123455)
+        self.assertEqual(variables["pi"], 3)
+        self.assertEqual(variables["cvVersion"], cv2.__version__)
+        self.assertFalse(variables["boolVal"])
 
     def test_figure_execute(self):
         self.script.set_source("""output_figs["testfig"] = plt.figure()
@@ -51,7 +52,7 @@ class TestProjectMethods(unittest.TestCase):
         self.assertEqual(p.get_author(), author1)
         self.assertEqual(p.get_title(), "")
         self.assertEqual(p.get_description(), "")
-        
+ 
         p.set_description(desc1)
         self.assertEqual(p.get_description(), desc1)
         self.assertEqual(p.get_title(), "")
@@ -65,9 +66,11 @@ class TestProjectMethods(unittest.TestCase):
         p = Project(title, author, desc)
         p.set_script(script)
         p.set_image(np.ones((480, 320, 3)))
-        p.save("/tmp/exproj.zip")
-        p2 = Project()
-        p2.load("/tmp/exproj.zip")
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            p.save("{}/exproj.zip".format(tmpdir))
+            p2 = Project()
+            p2.load("{}/exproj.zip".format(tmpdir))
 
         self.assertEqual(p2.get_author(), p.get_author())
         self.assertEqual(p2.get_author(), author)

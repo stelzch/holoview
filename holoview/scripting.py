@@ -160,7 +160,7 @@ class ScriptResultViewer:
         for key in variables:
             self.variable_model.append([str(key), str(variables[key])])
         for key in figs:
-            if type(figs[key]) is matplotlib.figure.Figure:
+            if isinstance(figs[key], matplotlib.figure.Figure):
                 logger.info("Processing figure {}".format(key))
                 sw = Gtk.ScrolledWindow()
                 canvas = FigureCanvas(figs[key])

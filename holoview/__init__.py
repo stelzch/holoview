@@ -20,7 +20,7 @@ def main():
     logger = log.create_custom_logger('HoloView')
     logger.debug('Starting application')
     mainwindow = MainWindow()
-    
+
     Gtk.main()
 
 if __name__ == "__main__":

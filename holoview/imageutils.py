@@ -22,7 +22,7 @@ def rgbarray2pixbuf(array):
                                              width * 3)
     return pixbuf
 
-def rgbarray2bytes(array, format='PNG'):
+def rgbarray2bytes(array, iformat='PNG'):
     """Get a RGB array as bytearray encoded in a certain format.
 
     Keyword arguments:
@@ -31,16 +31,16 @@ def rgbarray2bytes(array, format='PNG'):
     """
     tempImage = Image.fromarray(array, 'RGB')
     output = BytesIO()
-    tempImage.save(output, format=format)
+    tempImage.save(output, format=iformat)
     imgData = output.getvalue()
     output.close()
     return imgData
 
-def bytes2rgbarray(bytes):
+def bytes2rgbarray(bytes_):
     """Get an RGB array from a bytearray encoded in certain format.
 
     Keyword arguments:
     bytes -- a bytearray which stores the image
     """
-    buffer = BytesIO(bytes)
+    buffer = BytesIO(bytes_)
     return np.array(Image.open(buffer))

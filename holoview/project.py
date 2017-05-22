@@ -31,10 +31,10 @@ class Project:
         <description>
 
     """
-    def __init__(self, title="", author="", description="", script=Script(), 
+    def __init__(self, title="", author="", description="", script=Script(),
                  image=np.empty((0, 0))):
         """Initialize the project
-        
+
         By default, empty values are used"""
         self.title = title
         self.author = author

@@ -266,7 +266,7 @@ class MainWindow(GObject.GObject):
             self.captured_image = self.captured_image[:target_height,
                                                       :target_width,
                                                       :]
-            
+
             """Convert to GdkPixbuf for displaying"""
             pixbuf = rgbarray2pixbuf(self.captured_image)
             self.ui['capture_image'].set_from_pixbuf(pixbuf)
@@ -423,10 +423,10 @@ class MainWindow(GObject.GObject):
         return self.source.get_text(self.source.get_start_iter(),
                                     self.source.get_end_iter(), True)
 
-    def end(self, *args):
+    def quit(self, *args):
         """Stop any running capture and end program."""
         Gtk.main_quit()
 
     def __del__(self):
         """Stop any running capture and end program."""
-        self.end(None, None)
+        self.quit(None, None)

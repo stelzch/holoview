@@ -41,12 +41,12 @@ import numpy as np
 import PIL
 import cv2
 
-matplotlib.use("Gtk3Agg")
+matplotlib.use("Gtk3Cairo")
 gi.require_version('Gtk', '3.0')
 logger = logging.getLogger('HoloView')
 
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
 
 class Script:
     """Representing a user-written script for image evaluation."""

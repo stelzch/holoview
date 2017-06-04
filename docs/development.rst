@@ -1,7 +1,7 @@
 Developing HoloView
 ===================
 
-If you are interested in enhancing HoloView by adding new features, fixing old bugs or providing additional documentation, this page is for you.
+If you are interested in enhancing HoloView by adding new features, fixing bugs or providing additional documentation, this page is for you.
 
 
 Building from source
@@ -40,4 +40,5 @@ The other options are listed below:
     $ python3 setup.py install     # Install program
     $ python3 --command-packages=stdeb.command bdist_deb  # Create a deb file
 
-
+This will produce a .deb-file, which can be easily installed using `dpkg -i python3-holoview.deb`. Be aware that you have to take care of the dependencies by yourself if you are using the `dpkg -i` command. For automatic installation and updates we have set up the APT repository.
+ 

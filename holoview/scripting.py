@@ -148,9 +148,12 @@ class ScriptResultViewer:
         # Clear previous results
         self.variable_model.clear()
         for i in self.figures:
-            plt.close(self.figures[i])
-            self.figure_widgets[i].destroy()
-            self.figure_widgets.pop(i)
+            try:
+                plt.close(self.figures[i])
+                self.figure_widgets[i].destroy()
+                self.figure_widgets.pop(i)
+            except KeyError:
+                pass
         while self.ui["notebook"].get_n_pages() is not 0:
             self.ui["notebook"].remove_page(0)
 

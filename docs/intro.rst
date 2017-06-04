@@ -18,7 +18,10 @@ Now you can easily install `python3-holoview` after a quick `apt update`. Below 
     # apt install python3-holoview
     # exit
 
-And that's it! You can now launch HoloView from the start menu under the *Education* tab.    
+And that's it! You can now launch HoloView from the start menu under the *Education* tab.
+
+
+.. image:: _static/images/mainwindow.png
 
 Usage
 -----
@@ -59,6 +62,8 @@ If you programmed in any other language before, you won't have much trouble gett
     output_figs['Figure 1'] = plt.figure()     # Create a new figure
     plt.imshow(image)                          # Show the captured image in it
     output_vars['Some Var'] = 'Hello, World!'  # Display some text
+
+.. image:: _static/images/mainwindow_scripting_helloworld.png
 
 To run the script, press the button in the menu bar or simply hit `<Ctrl-R>`. Now, what will this script do? As you can see, the image is shown again in the scripting tab. Also, on the bottom we have a table with an entry called *Some Var* containing *Hello, World!*. Okay okay, I know, this demo is not the most impressive thing you have seen. But it is a good starting point for changes. Before making changes however, let's examine the script.
 

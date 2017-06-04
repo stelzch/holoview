@@ -12,6 +12,7 @@ Welcome to the HoloView documentation!
 
    intro 
    development
+   scripting_cookbook
 
 
 Indices and tables

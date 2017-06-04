@@ -84,7 +84,7 @@ class MainWindow(GObject.GObject):
         self.ui['awb_gains_label'].set_visible(False)
 
         # Connect signals
-        self.ui['main_window'].connect('delete-event', self.end)
+        self.ui['main_window'].connect('delete-event', self.quit)
         self.ui['main_window'].connect('key_release_event', self.on_key)
         self.ui['menu_open'].connect('activate', self.on_menu)
         self.ui['menu_save'].connect('activate', self.on_menu)
@@ -161,8 +161,6 @@ class MainWindow(GObject.GObject):
 
         # Initialize camera with overlay
         self.camera = PiCamera()
-        self.overlay_image = Image.open('%s/ui/overlay.png' % curdir)
-        self.overlay_image = self.overlay_image.tostring()
         self.captured_image = np.zeros((640, 480))
 
         self.ui['main_window'].show_all()
@@ -175,10 +173,6 @@ class MainWindow(GObject.GObject):
         current_tab = self.ui['tab_widget'].get_current_page()
         if current_tab is 0 and not self.previewing:
             self.camera.start_preview()
-            self.overlay = self.camera.add_overlay(self.overlay_image,
-                                                   size=(1920, 1088),
-                                                   format='rgba',
-                                                   layer=4)
             logger.info('Viewfinder started')
             self.ui['capture_button'].grab_focus()
             self.previewing = True
@@ -270,12 +264,10 @@ class MainWindow(GObject.GObject):
             """Convert to GdkPixbuf for displaying"""
             pixbuf = rgbarray2pixbuf(self.captured_image)
             self.ui['capture_image'].set_from_pixbuf(pixbuf)
-            self.camera.remove_overlay(self.overlay)
             self.previewing = False
             logger.info('Image was captured')
         elif self.previewing and event.keyval is ord('q'):
             self.camera.stop_preview()
-            self.camera.remove_overlay(self.overlay)
             self.previewing = False
             logger.info('Viewfinder quit')
 

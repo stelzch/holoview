@@ -9,7 +9,7 @@ import gi
 import cv2
 import logging
 import numpy as np
-from gi.repository import Gtk, GObject, Gst
+from gi.repository import Gtk, GObject
 from holoview.mainwindow import MainWindow
 from holoview import log
 

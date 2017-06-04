@@ -206,6 +206,7 @@ Niklas Jacob</property>
                       <object class="GtkMenuItem" id="menu_quit">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Exit the program</property>
                         <property name="label" translatable="yes">_Quit</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="gtk_main_quit" swapped="no"/>
@@ -229,7 +230,17 @@ Niklas Jacob</property>
                       <object class="GtkMenuItem" id="menu_info">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Show version number, contributers and license information</property>
                         <property name="label" translatable="yes">_Info</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menu_docs">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Open the documentation in your default browser</property>
+                        <property name="label" translatable="yes">_Documentation</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>

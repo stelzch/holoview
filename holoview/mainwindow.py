@@ -10,6 +10,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 import os
 import logging
+import webbrowser
 import cv2
 import numpy as np
 from gi.repository import Gtk, GtkSource, GObject, GLib
@@ -42,6 +43,7 @@ class MainWindow(GObject.GObject):
         self.ui['menu_save'] = builder.get_object('menu_save')
         self.ui['menu_quit'] = builder.get_object('menu_quit')
         self.ui['menu_info'] = builder.get_object('menu_info')
+        self.ui['menu_docs'] = builder.get_object('menu_docs')
         # Camera Parameters
         self.ui['brightness_spin'] = builder.get_object('brightness_spin')
         self.ui['contrast_spin'] = builder.get_object('contrast_spin')
@@ -90,6 +92,7 @@ class MainWindow(GObject.GObject):
         self.ui['menu_save'].connect('activate', self.on_menu)
         self.ui['menu_quit'].connect('activate', self.on_menu)
         self.ui['menu_info'].connect('activate', self.on_menu)
+        self.ui['menu_docs'].connect('activate', self.on_menu)
         self.ui['capture_button'].connect('clicked', self.start_capture)
         self.ui['brightness_adjus'].connect('value-changed',
                                             self.capture_param_changed)
@@ -338,6 +341,8 @@ class MainWindow(GObject.GObject):
         elif widget is self.ui['menu_info']:
             self.ui['about_dialog'].run()
             self.ui['about_dialog'].destroy()
+        elif widget is self.ui['menu_docs']:
+            webbrowser.open('file:///usr/share/doc/python3-holoview/index.html')
         elif widget is self.ui['menu_open']:
             logger.info('Opening project file')
             self.create_dialog('project_chooser')

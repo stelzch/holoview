@@ -38,9 +38,11 @@ The left image is the original captured image, right of it is the blurred versio
 with a filter size of 55 by 55.
 
 .. image:: _static/images/scripting_image_blur_original.png
+    :alt: The original image of a computer screen
     :width: 48%
 
 .. image:: _static/images/scripting_image_blur_blurred.png
+    :alt: The contours are still visible, yet the image is quite blurred
     :width: 48%
 
 Plot some curve

@@ -33,10 +33,11 @@ Besides the modules, the script can use the following variables:
   - output_vars     - dict of variables (str/float) to display in HoloView
   - output_figs     - dict of matplotlib figures to display in HoloView
 """
+import traceback
+import logging
 import gi
 from gi.repository import Gtk
 import matplotlib
-import logging
 import numpy as np
 import PIL
 import cv2
@@ -97,18 +98,26 @@ class Script:
         logger.debug("Running the following script:\n{}".format(script))
 
         # Here we go
-        exec(script, script_globals)
+        try:
+            exec(script, script_globals)
+        except SyntaxError as e:
+            return e
+
         logger.debug("Script left behind the following results:\n{}\n{}".format(
             self.output_vars,
             self.output_figs
         ))
+        return None
 
 
 class ScriptResultViewer:
     """Present the results of a script."""
 
     def __init__(self):
-        """Init."""
+        """Init.
+
+        Keyword arguments:
+        """
         self.box = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
 
         # Init models
@@ -137,14 +146,16 @@ class ScriptResultViewer:
 
         self.box.add1(self.ui["notebook"])
         self.box.add2(sw)
-        self.box.set_position(400)
+        self.box.set_position(300)
 
     def get_widget(self):
         """Get the widget."""
         return self.box
 
     def view_results(self, script):
-        """View the results of a given script."""
+        """View the results of a given script.
+        
+        Return: A list of exceptions that occured or None"""
         # Clear previous results
         self.variable_model.clear()
         for i in self.figures:

@@ -34,7 +34,7 @@ THE SOFTWARE.
     <property name="can_focus">False</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">HoloView</property>
-    <property name="version">0.0.3</property>
+    <property name="version">0.0.4</property>
     <property name="copyright" translatable="yes">(c) by Freiburg-Seminar</property>
     <property name="authors">Christoph Stelz
 Daniel Bücheler
@@ -96,6 +96,16 @@ Niklas Jacob</property>
     <property name="value">50</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
+  </object>
+  <object class="GtkListStore" id="error_liststore">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+      <!-- column-name description -->
+      <column type="gchararray"/>
+      <!-- column-name line -->
+      <column type="gint"/>
+    </columns>
   </object>
   <object class="GtkFileFilter" id="jpeg_filter">
     <mime-types>
@@ -813,29 +823,46 @@ Niklas Jacob</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkPaned" id="proc_box">
+                  <object class="GtkPaned">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="position">470</property>
                     <child>
-                      <object class="GtkScrolledWindow">
-                        <property name="width_request">500</property>
+                      <object class="GtkPaned" id="proc_box">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="hexpand">True</property>
                         <property name="vexpand">True</property>
-                        <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkViewport" id="script_editor_container">
+                          <object class="GtkScrolledWindow">
+                            <property name="width_request">500</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can_focus">True</property>
                             <property name="hexpand">True</property>
                             <property name="vexpand">True</property>
+                            <property name="shadow_type">in</property>
                             <child>
-                              <placeholder/>
+                              <object class="GtkViewport" id="script_editor_container">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                              </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="resize">False</property>
+                            <property name="shrink">True</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -844,13 +871,68 @@ Niklas Jacob</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkTreeView" id="error_list">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="model">error_liststore</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="errortype_column">
+                            <property name="resizable">True</property>
+                            <property name="sizing">autosize</property>
+                            <property name="min_width">100</property>
+                            <property name="title" translatable="yes">Type</property>
+                            <property name="reorderable">True</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="errordesc_column">
+                            <property name="resizable">True</property>
+                            <property name="sizing">autosize</property>
+                            <property name="min_width">500</property>
+                            <property name="title" translatable="yes">Description</property>
+                            <property name="reorderable">True</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn" id="errorline_column">
+                            <property name="resizable">True</property>
+                            <property name="sizing">autosize</property>
+                            <property name="title" translatable="yes">Line</property>
+                            <property name="reorderable">True</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">2</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="resize">True</property>
+                        <property name="shrink">True</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>

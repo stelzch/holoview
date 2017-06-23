@@ -79,6 +79,8 @@ class MainWindow(GObject.GObject):
         self.ui['project_filter'] = builder.get_object('project_filter')
         self.ui['postscript_filter'] = builder.get_object('postscript_filter')
         self.ui['script_result'] = ScriptResultViewer()
+        self.ui['error_liststore'] = builder.get_object('error_liststore')
+        self.ui['error_list'] = builder.get_object('error_list')
 
         # Additional props
         self.ui['awb_red_spin'].set_visible(False)
@@ -330,14 +332,19 @@ class MainWindow(GObject.GObject):
                 dialog.destroy()
 
         elif widget is self.ui['run_script']:
+            self.ui['error_liststore'].clear()
             self.script.set_source(self.get_sourcecode())
-            self.script.execute(self.captured_image)
-            self.ui['script_result'].view_results(self.script)
+            ret = self.script.execute(self.captured_image)
+            if ret is not None:
+                errorObj = ['SyntaxError', ret.msg, ret.lineno]
+                self.ui['error_liststore'].prepend(row=errorObj)
+            else:
+                self.ui['script_result'].view_results(self.script)
 
     def on_menu(self, widget, *event):
         """Handle menu items."""
         if widget is self.ui['menu_quit']:
-            self.end()
+            self.quit(None, None)
         elif widget is self.ui['menu_info']:
             self.ui['about_dialog'].run()
             self.ui['about_dialog'].destroy()

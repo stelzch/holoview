@@ -125,6 +125,10 @@ class ScriptResultViewer:
         self.figures = dict()
         self.figure_widgets = dict()
 
+        bg_style = self.box.get_style_context() \
+            .get_color(Gtk.StateFlags.NORMAL)
+        self.bg_color = [bg_style.red, bg_style.green, bg_style.blue]
+
         # Init views
         self.ui = dict()
         self.tabs = dict()
@@ -176,6 +180,7 @@ class ScriptResultViewer:
         for key in figs:
             if isinstance(figs[key], matplotlib.figure.Figure):
                 logger.info("Processing figure {}".format(key))
+                figs[key].set_facecolor(self.bg_color)
                 sw = Gtk.ScrolledWindow()
                 canvas = FigureCanvas(figs[key])
                 self.figure_widgets[key] = canvas

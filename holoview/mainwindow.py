@@ -342,7 +342,7 @@ class MainWindow(GObject.GObject):
                 type = ret.__class__.__name__
                 if isinstance(ret, SyntaxError):
                     """ SyntaxErrors already have a lineno property."""
-                    lineno = err.lineno
+                    lineno = ret.lineno
                 elif isinstance(ret, Exception):
                     """ All other exceptions are a little bit trickier."""
                     lineno = traceback.extract_tb(ret.__traceback__)[-1][1]

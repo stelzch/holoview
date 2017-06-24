@@ -5,10 +5,9 @@
 |     | . | | | | |  |  |__   |
 |__|__|___|_|_|_|_|_____|_____|
 """
-import math
-import gi
-gi.require_version('Gtk', '3.0')
+import sys
 import os
+import traceback
 import logging
 import webbrowser
 import cv2
@@ -335,9 +334,20 @@ class MainWindow(GObject.GObject):
             self.ui['error_liststore'].clear()
             self.script.set_source(self.get_sourcecode())
             ret = self.script.execute(self.captured_image)
+
             if ret is not None:
-                errorObj = ['SyntaxError', ret.msg, ret.lineno]
-                self.ui['error_liststore'].prepend(row=errorObj)
+                # Error happened, should be displayed
+                lineno = -1
+                msg = ret.args[0]
+                type = ret.__class__.__name__
+                if isinstance(ret, SyntaxError):
+                    """ SyntaxErrors already have a lineno property."""
+                    lineno = err.lineno
+                elif isinstance(ret, Exception):
+                    """ All other exceptions are a little bit trickier."""
+                    lineno = traceback.extract_tb(ret.__traceback__)[-1][1]
+
+                self.ui['error_liststore'].prepend(row=[type, msg, lineno])
             else:
                 self.ui['script_result'].view_results(self.script)
 

@@ -100,7 +100,7 @@ class Script:
         # Here we go
         try:
             exec(script, script_globals)
-        except SyntaxError as e:
+        except Exception as e:
             return e
 
         logger.debug("Script left behind the following results:\n{}\n{}".format(

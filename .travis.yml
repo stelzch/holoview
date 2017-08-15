@@ -1,6 +1,6 @@
 language: python
 python:
-    - "3.6_with_system_site_packages"
+    - "3.6"
 sudo: required
 dist: trusty
 before_install:
@@ -20,3 +20,5 @@ install:
     - sh .install-dependencies.sh
 script:
     - DEBUG=TRUE xvfb-run -a python -m unittest discover
+virtualenv:
+    system_site_packages: true

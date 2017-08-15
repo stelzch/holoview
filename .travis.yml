@@ -17,6 +17,6 @@ env:
         - PKG_CONFIG_PATH="$OPENCV_DIR/lib/pkgconfig"
         - PYTHONPATH="$OPENCV_DIR/lib/python3.6/site-packages"
 install:
-    - ./.install_dependencies.sh
+    - ./.install-dependencies.sh
 script:
     - python -m unittest discover

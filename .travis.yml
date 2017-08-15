@@ -19,4 +19,4 @@ env:
 install:
     - sh .install-dependencies.sh
 script:
-    - xvfb-run -a DEBUG=TRUE python -m unittest discover
+    - DEBUG=TRUE xvfb-run -a python -m unittest discover

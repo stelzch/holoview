@@ -34,6 +34,6 @@ env:
 install:
     - sh .install-dependencies.sh
 script:
-    - DEBUG=TRUE xvfb-run -a $PYTHON holoview/tests/__init__.py
+    - DEBUG=TRUE xvfb-run -a /usr/bin/$PYTHON holoview/tests/__init__.py
 
 

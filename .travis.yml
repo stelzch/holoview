@@ -3,23 +3,16 @@ python:
     - "3.4"
 sudo: required
 dist: trusty
-addons:
-    apt:
-        packages:
-            - python3-dev
-            - python3-numpy
-            - python3-pil
-            - python3-gi
-            - gir1.2-gladeui-2.0
-            - gir1.2-gtk-3.0
-            - libgtk2.0-dev
-            - libavcodec-dev
-            - libavformat-dev
-            - libswscale-dev
-            - libjpeg-dev
-            - libpng-dev
-            - libtiff-dev
-            - xvfb
+arch:
+    packages:
+        - python
+        - python-numpy
+        - python-matplotlib
+        - python-gi
+        - gtksourceview3
+        - opencv
+    script:
+        - "python3 -c 'import cv2'"
 cache:
     directories:
         - $OPENCV_DIR
@@ -31,10 +24,7 @@ env:
         - PKG_CONFIG_PATH="$OPENCV_DIR/lib/pkgconfig"
         - PYTHONPATH="$OPENCV_DIR/lib/python3.4/site-packages:/usr/lib/python3/dist-packages"
         - PYTHON="python3"
-install:
-    - sh .install-dependencies.sh
 script:
-    - DEBUG=TRUE xvfb-run -a $PYTHON -c "import cv2"
-      # holoview/tests/__init__.py
+    - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
 
 

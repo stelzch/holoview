@@ -1,5 +1,5 @@
 #!/bin/sh
-
+pip3 install -r requirements.txt
 if [ ! -d "$OPENCV_DIR/lib" ]; then
     wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz -O opencv-$OPENCV_VERSION.tar.gz
     tar xzf opencv-$OPENCV_VERSION.tar.gz

@@ -1,12 +1,4 @@
 #!/bin/sh
-pip3 install numpy
-
-# ================================== NUMPY ======================================
-# wget https://github.com/numpy/numpy/releases/download/v$NUMPY_VERSION/numpy-$NUMPY_VERSION.tar.gz
-# tar xzf numpy-$NUMPY_VERSION.tar.gz
-# cd numpy-$NUMPY_VERSION
-
-
 
 # ================================== OPENCV =====================================
 if [ ! -d "$OPENCV_DIR/lib" ]; then
@@ -22,6 +14,3 @@ if [ ! -d "$OPENCV_DIR/lib" ]; then
 else
     echo OpenCV already built, using that install.
 fi
-#cp -rv /usr/lib/python3/dist-packages/numpy* /home/travis/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python3.4/site-packages
-#ls -R /home/travis/virtualenv
-rm -rv /home/travis/virtualenv/python3.4/lib/python3.4/site-packages/numpy*

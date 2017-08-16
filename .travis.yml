@@ -8,7 +8,7 @@ arch:
         - python
         - python-numpy
         - python-matplotlib
-        - python-gi
+        - python-gobject
         - gtksourceview3
         - opencv
     script:

@@ -30,9 +30,10 @@ env:
         - LD_LIBRARY_PATH="$OPENCV_DIR/lib"
         - PKG_CONFIG_PATH="$OPENCV_DIR/lib/pkgconfig"
         - PYTHONPATH="$OPENCV_DIR/lib/python3.6/site-packages"
+        - PYTHON="python3.4"
 install:
     - sh .install-dependencies.sh
 script:
-    - DEBUG=TRUE xvfb-run -a python holoview/tests/__init__.py
+    - DEBUG=TRUE xvfb-run -a $PYTHON holoview/tests/__init__.py
 virtualenv:
     system_site_packages: true

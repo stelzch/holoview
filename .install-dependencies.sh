@@ -13,5 +13,5 @@ if [ ! -d "$OPENCV_DIR/lib" ]; then
 else
     echo OpenCV already built, using that install.
 fi
-cp -rv /usr/lib/python3/dist-packages/numpy* /home/travis/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python3.4/site-packages
-ls -R /home/travis/virtualenv
+#cp -rv /usr/lib/python3/dist-packages/numpy* /home/travis/virtualenv/python$TRAVIS_PYTHON_VERSION/lib/python3.4/site-packages
+#ls -R /home/travis/virtualenv

@@ -29,7 +29,7 @@ env:
         - OPENCV_DIR="$HOME/opencv-$OPENCV_VERSION"
         - LD_LIBRARY_PATH="$OPENCV_DIR/lib"
         - PKG_CONFIG_PATH="$OPENCV_DIR/lib/pkgconfig"
-        - PYTHONPATH="$OPENCV_DIR/lib/python3.6/site-packages"
+        - PYTHONPATH="$OPENCV_DIR/lib/python3.6/site-packages:/usr/lib/python3/dist-packages"
         - PYTHON="python3.4"
 install:
     - sh .install-dependencies.sh

@@ -9,10 +9,12 @@ arch:
         - python-numpy
         - python-matplotlib
         - python-gobject
+        - python-h5py
+        - python-pillow
+        - python-cairocffi
         - gtksourceview3
         - opencv
         - hdf5
-        - python-h5py
         - xorg-server-xvfb
     script:
         - "DEBUG=True xvfb-run -a python3.6 -m holoview.tests.__init__"

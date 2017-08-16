@@ -7,6 +7,7 @@
 """
 import sys
 import os
+import math
 import traceback
 import logging
 import webbrowser
@@ -14,7 +15,10 @@ import cv2
 import numpy as np
 from gi.repository import Gtk, GtkSource, GObject, GLib
 from PIL import Image
-from picamera import PiCamera
+if "CI" in os.environ:
+    from holoview.sys.picamera import PiCamera
+else:
+    from picamera import PiCamera
 from holoview.imageutils import rgbarray2pixbuf
 from holoview.scripting import ScriptResultViewer, Script
 from holoview.project import Project

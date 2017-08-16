@@ -12,7 +12,7 @@ arch:
         - gtksourceview3
         - opencv
     script:
-        - "python3 -c 'import cv2'"
+        - "python3.6 -c 'import cv2'"
 cache:
     directories:
         - $OPENCV_DIR

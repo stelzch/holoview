@@ -17,7 +17,7 @@ arch:
         - hdf5
         - xorg-server-xvfb
     script:
-        - "xvfb-run -a python3.6 -m holoview.tests.__init__ --debug"
+        - "xvfb-run -a python3.6 -m holoview.tests.__init__"
 script:
     - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
 

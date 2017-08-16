@@ -1,5 +1,14 @@
 #!/bin/sh
-pip3 install -r requirements.txt
+pip3 install numpy
+
+# ================================== NUMPY ======================================
+# wget https://github.com/numpy/numpy/releases/download/v$NUMPY_VERSION/numpy-$NUMPY_VERSION.tar.gz
+# tar xzf numpy-$NUMPY_VERSION.tar.gz
+# cd numpy-$NUMPY_VERSION
+
+
+
+# ================================== OPENCV =====================================
 if [ ! -d "$OPENCV_DIR/lib" ]; then
     wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.tar.gz -O opencv-$OPENCV_VERSION.tar.gz
     tar xzf opencv-$OPENCV_VERSION.tar.gz

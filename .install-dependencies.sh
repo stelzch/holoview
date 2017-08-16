@@ -8,7 +8,10 @@ if [ ! -d "$OPENCV_DIR/lib" ]; then
     cd opencv-$OPENCV_VERSION
     mkdir build
     cd build
-    cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX="$OPENCV_DIR" -DPYTHON3-EXECUTABLE=/usr/bin/python3.4  -DPYTHON3_INCLUDE_DIR=$(/usr/bin/python3.4 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") ..
+    cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX="$OPENCV_DIR" \
+    -DPYTHON3-EXECUTABLE=/usr/bin/python3.4  \
+    -DPYTHON3_INCLUDE_DIR=$(/usr/bin/python3.4 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
+    -D BUILD_EXAMPLES=OFF -D BUILD_TESTS=OFF -D BUILD_DOCS=OFF ..
     make -j2
     make install
 else

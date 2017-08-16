@@ -35,5 +35,5 @@ install:
     - sh .install-dependencies.sh
 script:
     - DEBUG=TRUE xvfb-run -a $PYTHON holoview/tests/__init__.py
-virtualenv:
-    system_site_packages: true
+
+

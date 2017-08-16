@@ -11,6 +11,8 @@ arch:
         - python-gobject
         - gtksourceview3
         - opencv
+        - hdf5
+        - python-h5py
     script:
         - "python3.6 -c 'import cv2'"
 cache:

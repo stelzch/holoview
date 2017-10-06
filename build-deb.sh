@@ -43,14 +43,16 @@ get_dir_size () {
 
 # ------------------------------ Step 1 ---------------------------------------
 # Clear the dist directory
-rm -r dist/*
+if [ -d dist ]; then
+    rm -r dist/*
+fi
 # Make sure that it has the subdirectories data and control
 mkdir -p dist/data dist/control
 
 # ------------------------------ Step 2 ---------------------------------------
 # Use the python distutils to build a binary distribution package. This creates
 # a tar.gz archive in the dist directory
-python3 setup.py bdist --format=gztar
+python setup.py bdist --format=gztar
 cd dist
 mv *.tar.gz data.tar.gz
 

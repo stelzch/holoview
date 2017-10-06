@@ -32,7 +32,7 @@ get_meta () {
     # - author, author-email, maintainer, maintainer-email
     # - contact, contact-email
     # - url, licence
-    echo $(python3 $SRCDIR/setup.py --$1)
+    echo $(python3.6 $SRCDIR/setup.py --$1)
 }
 
 get_dir_size () {
@@ -52,7 +52,7 @@ mkdir -p dist/data dist/control
 # ------------------------------ Step 2 ---------------------------------------
 # Use the python distutils to build a binary distribution package. This creates
 # a tar.gz archive in the dist directory
-python setup.py bdist --format=gztar
+python3.6 setup.py bdist --format=gztar
 cd dist
 mv *.tar.gz data.tar.gz
 

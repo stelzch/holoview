@@ -23,6 +23,8 @@ command -v sed >/dev/null 2>&1 || {
 SCRIPTFILE=$(readlink -f "$0")
 SRCDIR=$(dirname "$SCRIPTFILE")
 
+cd $SRCDIR 
+
 get_meta () {
     # This function gets a value supplied to the setup.py file.
     # With python3 setup.py --help you can see the possible values, these
@@ -52,7 +54,7 @@ mkdir -p dist/data dist/control
 # ------------------------------ Step 2 ---------------------------------------
 # Use the python distutils to build a binary distribution package. This creates
 # a tar.gz archive in the dist directory
-python3.6 setup.py bdist --format=gztar
+python3.6 $SRCDIR/setup.py bdist --format=gztar
 cd dist
 mv *.tar.gz data.tar.gz
 

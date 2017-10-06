@@ -20,5 +20,10 @@ arch:
         - "xvfb-run -a python3.6 -m holoview.tests.__init__"
 script:
     - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
-
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    on:
+        branch: master
 

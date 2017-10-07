@@ -18,9 +18,9 @@ arch:
         - xorg-server-xvfb
     script:
         - "xvfb-run -a python3.6 -m holoview.tests.__init__"
-        - ". ./build-deb.sh"
 script:
     - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
+    - "./build-deb.sh"
 deploy:
     provider: pages
     skip_cleanup: true

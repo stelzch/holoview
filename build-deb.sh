@@ -89,7 +89,7 @@ tar czf control.tar.gz -C control .
 # 1. debian-binary
 # 2. control.tar.gz
 # 3. data.tar.gz
-ar -q $(get_meta name)-$(get_meta version).deb \
+ar -q $TRAVIS_BUILD_DIR/$(get_meta name)-$(get_meta version).deb \
     debian-binary {control,data}.tar.gz
 # Remove the temporary build files
 rm -rf {control,data}.tar.gz control data debian-binary

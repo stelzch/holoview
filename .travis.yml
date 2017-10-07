@@ -21,12 +21,6 @@ arch:
 script:
     - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
     - "./build-deb.sh"
-deploy:
-    provider: pages
-    skip_cleanup: true
-    github_token: $GITHUB_TOKEN
-    file_glob: true
-    file: "holoview-*.deb" 
-    on:
-        branch: master
-
+after_success:
+    - "curl -T holoview-*.deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/holoview-latest.deb --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"
+    - "curl -T holoview-*.deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/ --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"

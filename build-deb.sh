@@ -92,7 +92,7 @@ tar czf control.tar.gz -C control .
 ar -q $(get_meta name)-$(get_meta version).deb \
     debian-binary {control,data}.tar.gz
 # Remove the temporary build files
-rm -r {control,data}.tar.gz control data debian-binary
+rm -rf {control,data}.tar.gz control data debian-binary
 
 # And that's it! We have just build a debian package from scratch, without any
 # debian-specific tooling.

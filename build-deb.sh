@@ -22,8 +22,9 @@ command -v sed >/dev/null 2>&1 || {
 # Determine the source code directory.
 SCRIPTFILE=$(readlink -f "$0")
 SRCDIR=$(dirname "$SCRIPTFILE")
+SRCDIR=$TRAVIS_BUILD_DIR
 
-cd $SRCDIR 
+cd $TRAVIS_BUILD_DIR 
 
 get_meta () {
     # This function gets a value supplied to the setup.py file.

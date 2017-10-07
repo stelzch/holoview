@@ -22,5 +22,5 @@ script:
     - "curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash"
     - "./build-deb.sh"
 after_success:
-    - "curl -T dist/holoview-$(python3 setup.py --version).deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/holoview-latest.deb --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"
-    - "curl -T dist/holoview-$(python3 setup.py --version).deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/ --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"
+    - "curl -T $TRAVIS_BUILD_DIR/dist/holoview-$(python3 setup.py --version).deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/holoview-latest.deb --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"
+    - "curl -T $TRAVIS_BUILD_DIR/dist/holoview-$(python3 setup.py --version).deb ftp://$DEPLOY_FTP_SERVER/$DEPLOY_FTP_DIRECTORY/ --user $DEPLOY_FTP_USER:'$DEPLOY_FTP_PASS'"

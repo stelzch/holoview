@@ -13,18 +13,21 @@
 #   - https://en.wikipedia.org/wiki/Deb_(file_format)                         #
 ###############################################################################
 
+# For colored output
+RED='\033[0;31m'
+GRAY='\033[1;30m'
+GREEN='\033[0;32m'
+NOCLR='\033[0m'	    # No Color
+
 # Check if sed is present, otherwise quit.
 command -v sed >/dev/null 2>&1 || {
-    echo "Error: this script requires sed, the stream editor."
+    echo -e "$RED[ERROR]$NOCLR this script requires sed, the stream editor."
     exit 1
 }
 
 # Determine the source code directory.
 SCRIPTFILE=$(readlink -f "$0")
 SRCDIR=$(dirname "$SCRIPTFILE")
-SRCDIR=$TRAVIS_BUILD_DIR
-
-cd $TRAVIS_BUILD_DIR 
 
 get_meta () {
     # This function gets a value supplied to the setup.py file.
@@ -35,7 +38,7 @@ get_meta () {
     # - author, author-email, maintainer, maintainer-email
     # - contact, contact-email
     # - url, licence
-    echo $(python3 $SRCDIR/setup.py --$1)
+    echo $(python3 setup.py --$1)
 }
 
 get_dir_size () {
@@ -46,8 +49,9 @@ get_dir_size () {
 
 # ------------------------------ Step 1 ---------------------------------------
 # Clear the dist directory
+echo -e $NOCLR[INFO] Clearing dist directory...
 if [ -d dist ]; then
-    rm -r dist/*
+    rm -r dist/
 fi
 # Make sure that it has the subdirectories data and control
 mkdir -p dist/data dist/control
@@ -55,21 +59,22 @@ mkdir -p dist/data dist/control
 # ------------------------------ Step 2 ---------------------------------------
 # Use the python distutils to build a binary distribution package. This creates
 # a tar.gz archive in the dist directory
-python3 $SRCDIR/setup.py bdist --format=gztar
-cd dist
-mv *.tar.gz data.tar.gz
+echo -e $NOCLR[INFO] Building binary python package... $GRAY
+python3 setup.py bdist --format=gztar
+mv dist/*.tar.gz dist/data.tar.gz
 
 # ----------------------------- Step 3 ----------------------------------------
 # To calculate the checksums, we first have to extract the package
-tar xf data.tar.gz -C data
-cd data
+echo -e $NOCLR[INFO] Calculating md5sums for package files... $GRAY
+tar xf dist/data.tar.gz -C dist/data
 # Run `md5sum` on every file and remove the leading ./ in filenames using sed
-find -type f -exec md5sum {} + | sed -r 's/([0-9a-f]{32})  .\//\1 /' > ../control/md5sums
-#                                              ^ ascii puke!
-cd ..
+find dist/data -type f -exec md5sum {} + \
+    | sed -r 's/([0-9a-f]{32})  .\//\1 /' > dist/control/md5sums
+#                           ^ ascii puke!
 
 # ----------------------------- Step 4 ----------------------------------------
 # The control file describes the packages name, version and dependencies.
+echo -e $NOCLR[INFO] Creating control files...$GRAY
 echo "Package: $(get_meta name)
 Version: $(get_meta version)
 Section: science
@@ -81,19 +86,21 @@ python3-numpy, python3-cairocffi, gir1.2-gtksource-3.0, python3-gi-cairo
 Suggests: holoview-doc
 Installed-Size: $(get_dir_size data)
 Maintainer: $(get_meta contact) <$(get_meta contact-email)>
-Description: $(get_meta description)" > control/control
-echo -e "2.0\n" > debian-binary
-tar czf control.tar.gz -C control .
+Description: $(get_meta description)" > dist/control/control
+echo -e "2.0\n" > dist/debian-binary
+tar czf dist/control.tar.gz -C dist/control .
 
 # ----------------------------- Step 5 ----------------------------------------
 # Create the deb file using `ar`. The order of files is important:
 # 1. debian-binary
 # 2. control.tar.gz
 # 3. data.tar.gz
-ar -q $TRAVIS_BUILD_DIR/$(get_meta name)-$(get_meta version).deb \
-    debian-binary {control,data}.tar.gz
+echo -e $NOCLR[INFO] Packing files into deb-package$GRAY
+ar -q $(get_meta name)-$(get_meta version).deb \
+    dist/debian-binary dist/{control,data}.tar.gz
 # Remove the temporary build files
-rm -rf {control,data}.tar.gz control data debian-binary
+rm -rf dist/*
 
 # And that's it! We have just build a debian package from scratch, without any
 # debian-specific tooling.
+echo -e $NOCLR[INFO] Created ${GREEN}$(get_meta name)-$(get_meta version).deb$NOCLR

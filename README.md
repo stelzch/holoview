@@ -1,3 +1,11 @@
+# Unmaintained!
+
+> [!WARNING]
+> This project is no longer supported. Please check out [holmos-rpi](https://github.com/holmos-ipm/holmos-rpi) for a maintained alternative.
+
+
+
+
 # HoloView
 A image capturing program for the Raspberry Pi with included image analysis & manipulation power.
 
